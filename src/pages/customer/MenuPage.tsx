@@ -15,7 +15,6 @@ import { Header } from '../../components/layout/Header';
 import { Hero3D } from '../../components/shared/Hero3D';
 import { CategoryFilter } from '../../components/shared/CategoryFilter';
 import { ProductCard } from '../../components/shared/ProductCard';
-import { TableSelectModal } from '../../components/shared/TableSelectModal';
 import { WaiterCallModal } from '../../components/shared/WaiterCallModal';
 import { CartDrawer } from '../../components/shared/CartDrawer';
 import { ProductDetailModal } from '../../components/shared/ProductDetailModal';
@@ -54,7 +53,6 @@ export function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState<string | null>(null);
   
-  const [isTableModalOpen, setIsTableModalOpen] = useState(false);
   const [isWaiterModalOpen, setIsWaiterModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
@@ -66,7 +64,6 @@ export function MenuPage() {
       setTableParam(urlTable);
       sessionStorage.setItem('cafe_vitus_table', urlTable);
       localStorage.setItem('cafe_vitus_table', urlTable);
-      toast.success(language === 'da' ? `Bord ${urlTable} registreret via QR` : `Table ${urlTable} recognized via QR`);
     }
   }, [urlTable, language]);
 
@@ -91,15 +88,6 @@ export function MenuPage() {
 
     return () => unsubMenu();
   }, []);
-
-  const handleTableSelect = (id: string) => {
-    setSearchParams({ table: id });
-    setTableParam(id);
-    sessionStorage.setItem('cafe_vitus_table', id);
-    localStorage.setItem('cafe_vitus_table', id);
-    setIsTableModalOpen(false);
-    toast.success(language === 'da' ? `Bord ${id} valgt` : `Table ${id} selected`);
-  };
 
   const handleQuickAdd = (item: MenuItem) => {
     if (item.customizations && item.customizations.length > 0) {
@@ -137,27 +125,22 @@ export function MenuPage() {
         tableNumber={tableParam || null}
         onCartClick={() => setIsCartOpen(true)}
         onWaiterClick={() => setIsWaiterModalOpen(true)}
-        onTableClick={() => setIsTableModalOpen(true)}
       />
 
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 w-full">
         {/* Scanned Table Confirmation Bar for Mobile */}
         {tableParam && (
-          <div className="mb-4 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between text-amber-900 dark:text-amber-300 text-xs font-bold shadow-xs">
+          <div className="mb-4 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between text-amber-900 dark:text-amber-300 text-xs font-black shadow-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>
-                {language === 'da' ? `Du bestiller til Bord ${tableParam}` : `Ordering for Table ${tableParam}`}
+                {language === 'da' ? `Bord ${tableParam} QR-kode registreret` : `Table ${tableParam} QR-code registered`}
               </span>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsTableModalOpen(true)}
-              className="text-[11px] underline font-semibold text-amber-700 dark:text-amber-400 cursor-pointer"
-            >
-              {language === 'da' ? 'Skift bord' : 'Change table'}
-            </button>
+            <div className="text-[11px] font-bold text-amber-800 dark:text-amber-400">
+              Cafe Vitus • Snekkersten
+            </div>
           </div>
         )}
 
@@ -319,11 +302,6 @@ export function MenuPage() {
       </footer>
 
       {/* Modals */}
-      <TableSelectModal
-        isOpen={isTableModalOpen}
-        onSelect={handleTableSelect}
-      />
-
       <WaiterCallModal
         isOpen={isWaiterModalOpen}
         onClose={() => setIsWaiterModalOpen(false)}

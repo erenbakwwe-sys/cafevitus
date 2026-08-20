@@ -97,14 +97,12 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
                 </div>
               </button>
 
-              {/* Scanned Table Pill Badge */}
+              {/* Scanned Table Pill Badge (Fixed via Table QR) */}
               {tableNumber && (
                 <div
-                  onClick={onTableClick}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-300 font-extrabold text-xs shadow-2xs cursor-pointer hover:bg-amber-100 transition-colors ml-1"
-                  title={t.table.changeTable}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-300 font-extrabold text-xs shadow-2xs ml-1"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-amber-600 animate-bounce" />
+                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
                   <span>Bord {tableNumber}</span>
                 </div>
               )}
