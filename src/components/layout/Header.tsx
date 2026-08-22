@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShoppingBag, Bell, Sun, Moon, MapPin, 
@@ -8,23 +8,23 @@ import {
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCart } from '../../contexts/CartContext';
-import { formatCurrency, cn } from '../../lib/utils';
+import { cn } from '../../lib/utils';
 
 export interface HeaderProps {
   onCartClick?: () => void;
   onWaiterClick?: () => void;
-  onTableClick?: () => void;
   tableNumber?: string | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTableClick, tableNumber }) => {
+export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tableNumber }) => {
   const { language, toggleLanguage, t } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
-  const { itemCount, total } = useCart();
+  const { itemCount } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
   const currentPath = location.pathname;
+  const isAdminPath = currentPath.startsWith('/admin');
 
   const appModes = [
     { path: `/${tableNumber ? `?table=${tableNumber}` : ''}`, label: language === 'da' ? 'Menukort' : 'Menu', icon: Utensils, match: (p: string) => p === '/' },
@@ -35,9 +35,9 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full shadow-sm">
-      {/* Top Universal Mode Navigation Bar */}
-      <div className="bg-slate-950 text-white px-3 sm:px-4 py-2 border-b border-slate-800">
+    <header className="sticky top-0 z-40 w-full shadow-xs">
+      {/* Top Universal Mode Bar (Always visible on Desktop, shown on mobile if on admin page) */}
+      <div className={cn("bg-slate-950 text-white px-3 sm:px-4 py-1.5 border-b border-slate-800", !isAdminPath && "hidden md:block")}>
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1.5 shrink-0">
             <span className="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
@@ -74,25 +74,25 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
       </div>
 
       {/* Main Brand & Controls Header */}
-      <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16 sm:h-20">
+      <div className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-15 sm:h-20">
             {/* Brand Logo */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <button
                 type="button"
                 onClick={() => navigate(`/${tableNumber ? `?table=${tableNumber}` : ''}`)}
-                className="flex items-center gap-2.5 sm:gap-3 text-left cursor-pointer group"
+                className="flex items-center gap-2 sm:gap-3 text-left cursor-pointer group"
               >
-                <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black shadow-md">
-                  <Coffee className="w-5 h-5 sm:w-6 sm:h-6" />
+                <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-amber-500 text-white flex items-center justify-center font-black shadow-md shrink-0">
+                  <Coffee className="w-4 h-4 sm:w-6 sm:h-6" />
                 </div>
                 <div>
-                  <div className="text-lg sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+                  <div className="text-base sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
                     Cafe Vitus
                   </div>
-                  <p className="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400">
-                    Snekkersten Havn • Danmark
+                  <p className="text-[9px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 hidden xs:block">
+                    Snekkersten Havn
                   </p>
                 </div>
               </button>
@@ -100,21 +100,21 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
               {/* Scanned Table Pill Badge (Fixed via Table QR) */}
               {tableNumber && (
                 <div
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/50 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-300 font-extrabold text-xs shadow-2xs ml-1"
+                  className="flex items-center gap-1 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-amber-50 dark:bg-amber-950/60 border border-amber-300 dark:border-amber-700/60 text-amber-900 dark:text-amber-300 font-extrabold text-[11px] sm:text-xs shadow-2xs shrink-0"
                 >
-                  <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                  <MapPin className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600" />
                   <span>Bord {tableNumber}</span>
                 </div>
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex items-center gap-1.5 sm:gap-3">
+            {/* Action Buttons with high-touch targets */}
+            <div className="flex items-center gap-1 sm:gap-2.5">
               {/* Language Switch */}
               <button
                 type="button"
                 onClick={toggleLanguage}
-                className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                className="min-h-[38px] px-2 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-extrabold bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center"
               >
                 {language === 'en' ? '🇩🇰 DA' : '🇬🇧 EN'}
               </button>
@@ -123,7 +123,7 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
               <button
                 type="button"
                 onClick={toggleTheme}
-                className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer"
+                className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer shrink-0"
                 aria-label="Toggle theme"
               >
                 {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
@@ -134,9 +134,9 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
                 <button
                   type="button"
                   onClick={onWaiterClick}
-                  className="flex items-center gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
+                  className="min-h-[38px] flex items-center gap-1 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-800 dark:text-amber-300 border border-amber-300 dark:border-amber-700 font-bold text-xs sm:text-sm transition-colors cursor-pointer"
                 >
-                  <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 animate-pulse" />
+                  <Bell className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 animate-pulse shrink-0" />
                   <span className="hidden sm:inline">{t.waiter.callWaiter}</span>
                 </button>
               )}
@@ -146,12 +146,12 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onTa
                 <button
                   type="button"
                   onClick={onCartClick}
-                  className="flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer relative"
+                  className="min-h-[38px] flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-slate-950 font-extrabold text-xs sm:text-sm shadow-md transition-all cursor-pointer relative"
                 >
-                  <ShoppingBag className="w-4 h-4" />
+                  <ShoppingBag className="w-4 h-4 shrink-0" />
                   <span className="hidden sm:inline">{t.cart.title}</span>
                   {itemCount > 0 && (
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 dark:bg-slate-900 text-white text-[11px] font-black">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 dark:bg-slate-900 text-white dark:text-amber-400 text-[11px] font-black shadow-xs">
                       {itemCount}
                     </span>
                   )}

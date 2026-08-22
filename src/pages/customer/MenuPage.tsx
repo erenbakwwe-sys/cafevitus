@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, AlertCircle, ArrowRight, Sparkles, MapPin, Coffee, Utensils, Check } from 'lucide-react';
+import { Search, AlertCircle, ArrowRight, MapPin, Coffee, Utensils, Check } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCart } from '../../contexts/CartContext';
@@ -24,18 +24,18 @@ const containerVariants = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.04,
     },
   },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 300, damping: 24 } },
+  hidden: { opacity: 0, y: 12 },
+  show: { opacity: 1, y: 0, transition: { type: 'spring' as const, stiffness: 320, damping: 24 } },
 };
 
 export function MenuPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   
   // Read table from URL params or stored session
   const urlTable = searchParams.get('table') || searchParams.get('t') || searchParams.get('tableId') || searchParams.get('masa');
@@ -119,7 +119,7 @@ export function MenuPage() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 dark:bg-[#070C18] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300">
+    <div className="min-h-screen flex flex-col bg-[#FAF9F5] dark:bg-[#070C18] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 pb-20">
       {/* Universal Header with Scanned Table Indicator */}
       <Header
         tableNumber={tableParam || null}
@@ -128,18 +128,18 @@ export function MenuPage() {
       />
 
       {/* Hero Section */}
-      <section className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-4 sm:pt-6 pb-2 w-full">
+      <section className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-1 w-full">
         {/* Scanned Table Confirmation Bar for Mobile */}
         {tableParam && (
-          <div className="mb-4 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between text-amber-900 dark:text-amber-300 text-xs font-black shadow-xs">
+          <div className="mb-3.5 p-3 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-between text-amber-900 dark:text-amber-300 text-xs font-black shadow-xs">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>
-                {language === 'da' ? `Bord ${tableParam} QR-kode registreret` : `Table ${tableParam} QR-code registered`}
+                {language === 'da' ? `Bord ${tableParam} QR-kode aktiv` : `Table ${tableParam} QR-code active`}
               </span>
             </div>
             <div className="text-[11px] font-bold text-amber-800 dark:text-amber-400">
-              Cafe Vitus • Snekkersten
+              Snekkersten Havn
             </div>
           </div>
         )}
@@ -148,7 +148,7 @@ export function MenuPage() {
         <Hero3D />
 
         {/* Search & Dietary Filters Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 mt-5 sm:mt-6">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
           {/* Search Box */}
           <div className="relative w-full md:w-80">
             <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -157,13 +157,13 @@ export function MenuPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={t.common.search}
-              className="w-full pl-10 pr-8 py-3 rounded-2xl bg-white dark:bg-[#0E172A] text-slate-900 dark:text-white placeholder-slate-400 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-xs font-bold shadow-xs transition-all"
+              className="w-full pl-10 pr-8 py-3 rounded-2xl bg-white dark:bg-[#0E172A] text-slate-900 dark:text-white placeholder-slate-400 border border-slate-200 dark:border-slate-800 focus:outline-none focus:ring-2 focus:ring-amber-500 text-xs font-bold shadow-2xs transition-all min-h-[44px]"
             />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery('')}
-                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600"
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 p-1"
               >
                 ✕
               </button>
@@ -175,9 +175,9 @@ export function MenuPage() {
             <button
               type="button"
               onClick={() => setActiveTag(null)}
-              className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer border shadow-2xs whitespace-nowrap ${
+              className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer border shadow-2xs whitespace-nowrap min-h-[38px] flex items-center ${
                 activeTag === null
-                  ? 'bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-950 dark:border-white'
+                  ? 'bg-slate-950 text-white border-slate-950 dark:bg-white dark:text-slate-950 dark:border-white'
                   : 'bg-white dark:bg-[#0E172A] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
@@ -188,7 +188,7 @@ export function MenuPage() {
                 type="button"
                 key={tag.id}
                 onClick={() => setActiveTag(activeTag === tag.id ? null : tag.id)}
-                className={`px-3 sm:px-4 py-2 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap border shadow-2xs ${
+                className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-black transition-all cursor-pointer whitespace-nowrap border shadow-2xs min-h-[38px] flex items-center ${
                   activeTag === tag.id
                     ? 'bg-amber-500 text-slate-950 border-amber-500 font-black'
                     : 'bg-white dark:bg-[#0E172A] text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -209,22 +209,22 @@ export function MenuPage() {
       />
 
       {/* Products Grid (1 Col Mobile, 2 Col Tablet, 3 Col Desktop) */}
-      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="flex-1 max-w-6xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-8">
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8 animate-pulse">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 animate-pulse">
             {[1, 2, 3, 4, 5, 6].map((n) => (
-              <div key={n} className="h-84 bg-slate-200 dark:bg-slate-800/80 rounded-3xl" />
+              <div key={n} className="h-72 bg-slate-200 dark:bg-slate-800/80 rounded-3xl" />
             ))}
           </div>
         ) : filteredItems.length === 0 ? (
           <motion.div 
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="text-center py-16 sm:py-20 bg-white dark:bg-[#0E172A] rounded-3xl border border-slate-200 dark:border-slate-800 p-8 max-w-md mx-auto shadow-sm"
+            className="text-center py-14 sm:py-20 bg-white dark:bg-[#0E172A] rounded-3xl border border-slate-200 dark:border-slate-800 p-6 sm:p-8 max-w-md mx-auto shadow-xs"
           >
-            <AlertCircle className="w-12 h-12 text-slate-400 mx-auto mb-3" />
-            <h3 className="text-lg font-bold mb-1">{t.common.noResults}</h3>
-            <p className="text-xs text-slate-500 mb-6">
+            <AlertCircle className="w-10 h-10 text-slate-400 mx-auto mb-2.5" />
+            <h3 className="text-base sm:text-lg font-bold mb-1">{t.common.noResults}</h3>
+            <p className="text-xs text-slate-500 mb-5">
               {searchQuery ? `Ingen retter matcher "${searchQuery}"` : (language === 'da' ? 'Prøv at vælge en anden kategori.' : 'Try selecting another category.')}
             </p>
             <button
@@ -234,7 +234,7 @@ export function MenuPage() {
                 setActiveCategory(null);
                 setActiveTag(null);
               }}
-              className="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-bold dark:bg-white dark:text-slate-950 cursor-pointer shadow-md"
+              className="px-5 py-2.5 rounded-xl bg-slate-950 text-white text-xs font-bold dark:bg-white dark:text-slate-950 cursor-pointer shadow-md"
             >
               {t.menu.allItems}
             </button>
@@ -245,7 +245,7 @@ export function MenuPage() {
             initial="hidden"
             animate="show"
             key={activeCategory || 'all'}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
           >
             {filteredItems.map((item) => (
               <motion.div key={item.id} variants={itemVariants}>
@@ -260,32 +260,32 @@ export function MenuPage() {
         )}
       </main>
 
-      {/* Floating Bottom Sticky Cart Bar */}
+      {/* Floating Bottom Sticky Cart Bar on Mobile */}
       <AnimatePresence>
         {itemCount > 0 && (
           <motion.div
-            initial={{ y: 80, opacity: 0, scale: 0.9 }}
+            initial={{ y: 80, opacity: 0, scale: 0.95 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: 80, opacity: 0, scale: 0.9 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 220 }}
-            className="fixed bottom-4 sm:bottom-6 inset-x-3 sm:inset-x-auto sm:right-8 sm:max-w-md z-40"
+            exit={{ y: 80, opacity: 0, scale: 0.95 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 240 }}
+            className="fixed bottom-3 sm:bottom-6 inset-x-3 sm:inset-x-auto sm:right-8 sm:max-w-md z-40 pb-[env(safe-area-inset-bottom)]"
           >
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
-              className="w-full flex items-center justify-between p-3.5 sm:p-4 px-5 sm:px-6 rounded-2xl bg-slate-950 dark:bg-amber-500 text-white dark:text-slate-950 font-extrabold shadow-2xl transition-all cursor-pointer border border-slate-800 dark:border-amber-400 group"
+              className="w-full flex items-center justify-between p-3.5 sm:p-4 px-4 sm:px-6 rounded-2xl bg-slate-950 dark:bg-amber-500 text-white dark:text-slate-950 font-black shadow-2xl transition-all cursor-pointer border border-slate-800 dark:border-amber-400 group min-h-[56px]"
             >
               <div className="flex items-center gap-3">
                 <div className="w-8 h-8 rounded-xl bg-amber-500 dark:bg-slate-950 text-white dark:text-amber-400 flex items-center justify-center font-black text-xs shadow-md">
                   {itemCount}
                 </div>
                 <div className="text-left">
-                  <div className="text-[11px] sm:text-xs opacity-80 uppercase tracking-wider font-bold">{t.cart.title}</div>
+                  <div className="text-[10px] sm:text-xs opacity-80 uppercase tracking-wider font-bold">{t.cart.title}</div>
                   <div className="text-sm sm:text-base font-black">{formatCurrency(total)}</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 text-xs font-bold bg-white/20 dark:bg-black/15 px-3.5 py-2 rounded-xl group-hover:translate-x-1 transition-transform">
+              <div className="flex items-center gap-2 text-xs font-black bg-white/20 dark:bg-black/15 px-3.5 py-2 rounded-xl group-hover:translate-x-1 transition-transform">
                 <span>{t.cart.placeOrder}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </div>
@@ -295,8 +295,8 @@ export function MenuPage() {
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070C18] py-8 text-center text-xs text-slate-500 mt-12">
-        <p className="font-extrabold text-slate-900 dark:text-white text-sm sm:text-base">Cafe Vitus • Snekkersten Havn</p>
+      <footer className="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-[#070C18] py-8 text-center text-xs text-slate-500 mt-8">
+        <p className="font-black text-slate-900 dark:text-white text-sm sm:text-base">Cafe Vitus • Snekkersten Havn</p>
         <p className="text-[11px] text-slate-400 mt-1">Hvor havnen møder exceptionel kaffe, is & mad.</p>
         <p className="text-[10px] text-slate-400 mt-3">© {new Date().getFullYear()} Cafe Vitus. {language === 'da' ? 'Alle rettigheder forbeholdes.' : 'All rights reserved.'}</p>
       </footer>
