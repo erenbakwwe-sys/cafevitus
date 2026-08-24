@@ -12,7 +12,7 @@ interface TableSelectModalProps {
 }
 
 export function TableSelectModal({ isOpen, onSelect }: TableSelectModalProps) {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { isDark } = useTheme();
   const [manualTable, setManualTable] = useState('');
 
@@ -75,7 +75,9 @@ export function TableSelectModal({ isOpen, onSelect }: TableSelectModalProps) {
 
                 <div className="relative flex items-center py-2">
                   <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
-                  <span className="mx-4 flex-shrink-0 text-xs uppercase font-bold text-slate-400">eller</span>
+                  <span className="mx-4 flex-shrink-0 text-xs uppercase font-bold text-slate-400">
+                    {t.common.or}
+                  </span>
                   <div className="flex-grow border-t border-slate-200 dark:border-slate-800"></div>
                 </div>
 
@@ -90,7 +92,7 @@ export function TableSelectModal({ isOpen, onSelect }: TableSelectModalProps) {
                         type="text"
                         value={manualTable}
                         onChange={(e) => setManualTable(e.target.value)}
-                        placeholder="F.eks. 1, A2, Bar..."
+                        placeholder={t.table.enterManuallyPlaceholder}
                         className={`w-full rounded-xl py-3 pl-10 pr-4 outline-none ring-1 transition-shadow focus:ring-2 focus:ring-sky-500 ${
                           isDark
                             ? 'bg-slate-800 ring-slate-700 text-white placeholder-slate-500'

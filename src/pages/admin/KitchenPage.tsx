@@ -4,7 +4,7 @@ import { storage } from '../../lib/storage';
 import { Order } from '../../types';
 import { getMinutesAgo, cn } from '../../lib/utils';
 import { playNewOrderSound, isAudioEnabled, unlockAudio } from '../../lib/audio';
-import { ChefHat, Clock, AlertTriangle, CheckCircle, Volume2, VolumeX } from 'lucide-react';
+import { ChefHat, Clock, AlertTriangle, CheckCircle, Volume2, VolumeX, Sparkles, Check, Coffee } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '../../contexts/LanguageContext';
 
@@ -65,55 +65,56 @@ export default function KitchenPage() {
     return (
       <motion.div
         layout
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 10 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 260 }}
         className={cn(
-          "bg-white dark:bg-slate-800/90 rounded-2xl p-5 shadow-sm border-2 transition-all flex flex-col gap-4",
-          isOverdue ? "border-red-500 shadow-lg shadow-red-500/10 animate-pulse" : 
-          isWarning ? "border-amber-500" : "border-slate-200 dark:border-slate-700"
+          "bg-white/95 dark:bg-[#0E172A]/95 backdrop-blur-xl rounded-[1.75rem] p-5 sm:p-6 shadow-md border-2 transition-all flex flex-col gap-4",
+          isOverdue ? "border-red-500 shadow-xl shadow-red-500/15 animate-pulse" : 
+          isWarning ? "border-amber-400 shadow-lg shadow-amber-400/10" : "border-slate-200/80 dark:border-slate-800"
         )}
       >
-        <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-700 pb-3">
+        <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3.5">
           <div>
-            <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white Outfit">
+            <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white Outfit">
               {t.table.tableNumber} {order.tableId}
             </div>
-            <div className="text-xs text-slate-400 font-mono">#{order.id.slice(0, 6).toUpperCase()}</div>
+            <div className="text-xs text-slate-400 font-mono font-bold mt-0.5">#{order.id.slice(0, 6).toUpperCase()}</div>
           </div>
           <div className={cn(
-            "flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold",
+            "flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black shadow-2xs",
             isOverdue ? "bg-red-500 text-white animate-bounce" :
-            isWarning ? "bg-amber-500 text-white" :
-            "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+            isWarning ? "bg-amber-400 text-slate-950" :
+            "bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
           )}>
             <Clock className="w-3.5 h-3.5" />
-            {minutesElapsed} {t.orderTracking.minutes}
+            <span>{minutesElapsed} {t.orderTracking.minutes}</span>
             {isOverdue && ` (${t.admin.kitchen.delayed})`}
           </div>
         </div>
 
         <div className="flex-1 space-y-3">
           {order.items.map((item, idx) => (
-            <div key={idx} className="flex gap-3 text-base">
-              <span className="font-extrabold text-sky-600 dark:text-sky-400 min-w-[24px]">
+            <div key={idx} className="flex gap-3 text-sm sm:text-base">
+              <span className="font-black text-amber-600 dark:text-amber-400 min-w-[26px]">
                 {item.quantity}x
               </span>
               <div className="flex-1">
-                <span className="font-bold text-slate-900 dark:text-white">
+                <span className="font-extrabold text-slate-900 dark:text-white">
                   {item.name[language] || item.name.en}
                 </span>
                 {item.customerNote && (
-                  <p className="text-xs text-red-500 font-bold mt-1 flex items-start gap-1 bg-red-50 dark:bg-red-950/40 p-1.5 rounded-lg">
+                  <p className="text-xs text-red-600 dark:text-red-400 font-bold mt-1 flex items-start gap-1 bg-red-50 dark:bg-red-950/50 p-2 rounded-xl border border-red-200 dark:border-red-900/50">
                     <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
-                    {item.customerNote}
+                    <span>{item.customerNote}</span>
                   </p>
                 )}
                 {item.selectedCustomizations && item.selectedCustomizations.length > 0 && (
-                  <div className="text-xs text-slate-500 mt-1 flex flex-wrap gap-1">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1 flex flex-wrap gap-1">
                     {item.selectedCustomizations.flatMap((c) =>
                       c.selectedOptions.map((opt) => (
-                        <span key={opt.id} className="bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 rounded text-[11px]">
+                        <span key={opt.id} className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-0.5 rounded-lg text-[11px] font-bold">
                           +{opt.name[language] || opt.name.en}
                         </span>
                       ))
@@ -124,36 +125,42 @@ export default function KitchenPage() {
             </div>
           ))}
           {order.customerNote && (
-            <div className="p-2 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded-xl text-xs text-amber-700 dark:text-amber-300 font-semibold">
-              Note: {order.customerNote}
+            <div className="p-3 bg-amber-50 dark:bg-amber-950/40 border border-amber-300 dark:border-amber-800/60 rounded-2xl text-xs text-amber-800 dark:text-amber-300 font-bold">
+              {t.admin.kitchen.note} {order.customerNote}
             </div>
           )}
         </div>
 
-        <div className="pt-3 mt-auto border-t border-slate-100 dark:border-slate-700 flex gap-2">
+        <div className="pt-3 mt-auto border-t border-slate-100 dark:border-slate-800 flex gap-2">
           {order.status === 'pending' && (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
               onClick={() => updateOrderStatus(order.id, 'preparing')}
-              className="flex-1 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold rounded-xl text-sm transition-colors shadow-md shadow-amber-500/20"
+              className="flex-1 py-3.5 bg-amber-400 hover:bg-amber-500 text-slate-950 font-black rounded-2xl text-xs sm:text-sm transition-all shadow-md cursor-pointer"
             >
               {t.admin.kitchen.markPreparing}
-            </button>
+            </motion.button>
           )}
           {order.status === 'preparing' && (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
               onClick={() => updateOrderStatus(order.id, 'ready')}
-              className="flex-1 py-3 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-xl text-sm transition-colors flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20"
+              className="flex-1 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-black rounded-2xl text-xs sm:text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 cursor-pointer"
             >
-              <CheckCircle className="w-4 h-4" /> {t.admin.kitchen.markReady}
-            </button>
+              <CheckCircle className="w-4 h-4 stroke-[2.5]" /> <span>{t.admin.kitchen.markReady}</span>
+            </motion.button>
           )}
           {order.status === 'ready' && (
-            <button
+            <motion.button
+              whileTap={{ scale: 0.96 }}
+              type="button"
               onClick={() => updateOrderStatus(order.id, 'delivered')}
-              className="flex-1 py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition-colors"
+              className="flex-1 py-3.5 bg-slate-950 hover:bg-slate-900 dark:bg-white dark:text-slate-950 text-white font-black rounded-2xl text-xs sm:text-sm transition-all shadow-md cursor-pointer"
             >
               {t.admin.kitchen.markDelivered}
-            </button>
+            </motion.button>
           )}
         </div>
       </motion.div>
@@ -161,13 +168,13 @@ export default function KitchenPage() {
   };
 
   const Column = ({ title, columnOrders, color }: { title: string; columnOrders: Order[]; color: string }) => (
-    <div className="flex flex-col h-full bg-slate-100/60 dark:bg-slate-900/60 rounded-3xl p-4 overflow-hidden border border-slate-200/50 dark:border-slate-800">
+    <div className="flex flex-col h-full bg-slate-100/70 dark:bg-[#070C18]/70 backdrop-blur-xl rounded-[2rem] p-4.5 overflow-hidden border border-slate-200/70 dark:border-slate-800 shadow-sm">
       <div className="flex items-center justify-between mb-4 px-2">
-        <h2 className="text-lg font-bold flex items-center gap-2 Outfit">
-          <div className={cn("w-3 h-3 rounded-full", color)} />
-          {title}
+        <h2 className="text-lg font-extrabold flex items-center gap-2.5 font-serif-luxury text-slate-900 dark:text-white">
+          <div className={cn("w-3 h-3 rounded-full animate-beacon", color)} />
+          <span>{title}</span>
         </h2>
-        <span className="bg-slate-200 dark:bg-slate-800 px-3 py-1 rounded-full text-xs font-black">
+        <span className="bg-white dark:bg-slate-800 text-slate-900 dark:text-white px-3 py-1 rounded-full text-xs font-black shadow-2xs border border-slate-200 dark:border-slate-700">
           {columnOrders.length}
         </span>
       </div>
@@ -177,7 +184,7 @@ export default function KitchenPage() {
             <OrderCard key={order.id} order={order} />
           ))}
           {columnOrders.length === 0 && (
-            <div className="h-32 flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700/60 rounded-2xl text-slate-400 font-medium text-sm">
+            <div className="h-36 flex items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-3xl text-slate-400 font-bold text-xs">
               {t.admin.kitchen.noOrders}
             </div>
           )}
@@ -190,34 +197,38 @@ export default function KitchenPage() {
     <div className="h-[calc(100vh-4rem)] lg:h-screen flex flex-col p-4 sm:p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6 shrink-0">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-sky-100 dark:bg-sky-500/20 rounded-2xl text-sky-600 dark:text-sky-400">
+          <div className="p-3 bg-amber-400/20 rounded-2xl text-amber-600 dark:text-amber-400 shadow-inner">
             <ChefHat className="w-6 h-6" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl font-black Outfit">{t.admin.kitchen.title}</h1>
-            <p className="text-xs text-slate-500">{activeOrders.length} {t.admin.kitchen.waitingTime}</p>
+            <h1 className="text-2xl sm:text-3xl font-extrabold font-serif-luxury text-slate-900 dark:text-white">{t.admin.kitchen.title}</h1>
+            <p className="text-xs text-slate-500 font-bold mt-0.5">{activeOrders.length} {t.admin.kitchen.waitingTime} • {t.productCard.harborLocation}</p>
           </div>
         </div>
         
-        <button
+        <motion.button
+          whileHover={{ scale: 1.03 }}
+          whileTap={{ scale: 0.97 }}
+          type="button"
           onClick={handleAudioUnlock}
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all shadow-sm",
+            "flex items-center gap-2 px-4.5 py-2.5 rounded-2xl font-black text-xs sm:text-sm transition-all shadow-xs cursor-pointer",
             audioUnlocked 
-              ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
-              : "bg-amber-500 text-white hover:bg-amber-600 animate-pulse shadow-md shadow-amber-500/25"
+              ? "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700"
+              : "bg-amber-400 text-slate-950 hover:bg-amber-500 shadow-lg shadow-amber-400/25 animate-pulse"
           )}
         >
           {audioUnlocked ? <Volume2 className="w-4 h-4 text-emerald-500" /> : <VolumeX className="w-4 h-4" />}
-          {audioUnlocked ? t.admin.kitchen.soundOn : t.admin.kitchen.enableSound}
-        </button>
+          <span>{audioUnlocked ? t.admin.kitchen.soundOn : t.admin.kitchen.enableSound}</span>
+        </motion.button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 flex-1 min-h-0">
         <Column title={t.admin.kitchen.newOrders} columnOrders={pendingOrders} color="bg-red-500" />
-        <Column title={t.admin.kitchen.inProgress} columnOrders={preparingOrders} color="bg-amber-500" />
+        <Column title={t.admin.kitchen.inProgress} columnOrders={preparingOrders} color="bg-amber-400" />
         <Column title={t.admin.kitchen.readyToServe} columnOrders={readyOrders} color="bg-emerald-500" />
       </div>
     </div>
   );
 }
+

@@ -70,7 +70,7 @@ export default function MenuManagementPage() {
   const handleSaveItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nameEn || !nameDa || price <= 0 || !categoryId) {
-      toast.error('Udfyld venligst alle obligatoriske felter');
+      toast.error(t.common.fillRequiredFields);
       return;
     }
 
@@ -232,7 +232,7 @@ export default function MenuManagementPage() {
                   </td>
                   <td className="p-4">
                     <span className="px-3 py-1 bg-slate-100 dark:bg-slate-800 rounded-full text-xs font-semibold">
-                      {categories.find((c) => c.id === item.categoryId)?.name[language] || 'Unknown'}
+                      {categories.find((c) => c.id === item.categoryId)?.name[language] || t.common.unknown}
                     </span>
                   </td>
                   <td className="p-4 font-bold text-sm text-sky-600 dark:text-sky-400">
@@ -296,24 +296,24 @@ export default function MenuManagementPage() {
             <form onSubmit={handleSaveItem} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Danish Name (DA) *</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.nameDa}</label>
                   <input
                     type="text"
                     required
                     value={nameDa}
                     onChange={(e) => setNameDa(e.target.value)}
-                    placeholder="f.eks. Røget Laks Smørrebrød"
+                    placeholder={t.admin.menuMgmt.nameDaPlaceholder}
                     className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">English Name (EN) *</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.nameEn}</label>
                   <input
                     type="text"
                     required
                     value={nameEn}
                     onChange={(e) => setNameEn(e.target.value)}
-                    placeholder="e.g. Smoked Salmon Smørrebrød"
+                    placeholder={t.admin.menuMgmt.nameEnPlaceholder}
                     className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-medium"
                   />
                 </div>
@@ -321,22 +321,22 @@ export default function MenuManagementPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Danish Description (DA)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.descDa}</label>
                   <textarea
                     rows={2}
                     value={descDa}
                     onChange={(e) => setDescDa(e.target.value)}
-                    placeholder="Beskrivelse på dansk..."
+                    placeholder={t.admin.menuMgmt.descDaPlaceholder}
                     className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">English Description (EN)</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.descEn}</label>
                   <textarea
                     rows={2}
                     value={descEn}
                     onChange={(e) => setDescEn(e.target.value)}
-                    placeholder="Description in English..."
+                    placeholder={t.admin.menuMgmt.descEnPlaceholder}
                     className="w-full p-3 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm"
                   />
                 </div>
@@ -344,7 +344,7 @@ export default function MenuManagementPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Price (DKK) *</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.itemPrice} *</label>
                   <input
                     type="number"
                     min="1"
@@ -357,7 +357,7 @@ export default function MenuManagementPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 mb-1">Category *</label>
+                  <label className="block text-xs font-bold text-slate-500 mb-1">{t.admin.menuMgmt.itemCategory} *</label>
                   <select
                     value={categoryId}
                     onChange={(e) => setCategoryId(e.target.value)}

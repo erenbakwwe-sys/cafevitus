@@ -119,7 +119,7 @@ export default function CouponsPage() {
             <Ticket className="w-8 h-8 text-sky-500" />
             {t.admin.coupons.title}
           </h1>
-          <p className="text-sm text-slate-500">Rabatkoder & kundeloyalitet</p>
+          <p className="text-sm text-slate-500">{t.admin.coupons.subtitle}</p>
         </div>
         <button
           onClick={openAdd}
@@ -157,7 +157,7 @@ export default function CouponsPage() {
                   <div>
                     <div className="text-xs text-slate-400 uppercase tracking-wider font-extrabold">{coupon.code}</div>
                     <div className="text-2xl font-black text-slate-900 dark:text-white">
-                      {coupon.type === 'percentage' ? `${coupon.value}% RABAT` : formatCurrency(coupon.value)}
+                      {coupon.type === 'percentage' ? `${coupon.value}% ${t.admin.coupons.discountBadge}` : formatCurrency(coupon.value)}
                     </div>
                   </div>
                 </div>
@@ -214,8 +214,8 @@ export default function CouponsPage() {
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500">{t.admin.coupons.couponCode}</label>
                 <div className="flex gap-2">
-                  <input required type="text" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder="f.eks. SOMMER20" className={cn("w-full p-3 rounded-xl border outline-none font-mono uppercase text-sm font-bold", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
-                  <button type="button" onClick={generateCode} className="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">Generer</button>
+                  <input required type="text" value={code} onChange={(e) => setCode(e.target.value.toUpperCase())} placeholder={t.admin.coupons.codePlaceholder} className={cn("w-full p-3 rounded-xl border outline-none font-mono uppercase text-sm font-bold", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                  <button type="button" onClick={generateCode} className="px-4 py-2 bg-slate-200 dark:bg-slate-700 rounded-xl font-bold text-xs">{t.admin.coupons.generate}</button>
                 </div>
               </div>
               

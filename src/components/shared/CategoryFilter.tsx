@@ -1,4 +1,5 @@
 import React, { useRef, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import { LayoutGrid, Utensils, Salad, Coffee, Wine, IceCream, Croissant, Sparkles } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -27,7 +28,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, acti
   };
 
   useEffect(() => {
-    if (activeCategory && scrollRef.current) {
+    if (scrollRef.current) {
       const activeEl = scrollRef.current.querySelector('[data-active="true"]');
       if (activeEl) {
         activeEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
@@ -36,26 +37,35 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, acti
   }, [activeCategory]);
 
   return (
-    <div className="sticky top-16 sm:top-20 z-30 w-full bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-3 shadow-xs">
+    <div className="sticky top-15 sm:top-20 z-30 w-full bg-white/85 dark:bg-[#070C18]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 py-3 shadow-xs">
       <div 
         ref={scrollRef}
-        className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 overflow-x-auto no-scrollbar"
+        className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar"
       >
+        {/* All Items Pill */}
         <button
           type="button"
           onClick={() => onSelect(null)}
           data-active={activeCategory === null}
           className={cn(
-            "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 border",
+            "relative flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-colors cursor-pointer shrink-0 min-h-[42px] z-10",
             activeCategory === null 
-              ? "bg-slate-900 text-white border-slate-900 dark:bg-white dark:text-slate-950 dark:border-white shadow-sm" 
-              : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+              ? "text-slate-950 dark:text-slate-950 font-black" 
+              : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60"
           )}
         >
-          <LayoutGrid className="w-4 h-4" />
+          {activeCategory === null && (
+            <motion.div
+              layoutId="activeCategoryPill"
+              className="absolute inset-0 bg-amber-400 dark:bg-amber-400 rounded-2xl shadow-md -z-10"
+              transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+            />
+          )}
+          <LayoutGrid className="w-4 h-4 shrink-0" />
           <span>{t.menu.allItems}</span>
         </button>
 
+        {/* Category List */}
         {categories.map((cat) => {
           const isActive = activeCategory === cat.id;
           return (
@@ -65,12 +75,19 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, acti
               onClick={() => onSelect(cat.id)}
               data-active={isActive}
               className={cn(
-                "flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 border whitespace-nowrap",
+                "relative flex items-center gap-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-extrabold transition-colors cursor-pointer shrink-0 min-h-[42px] whitespace-nowrap z-10",
                 isActive 
-                  ? "bg-amber-500 text-slate-950 border-amber-500 shadow-sm" 
-                  : "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700"
+                  ? "text-slate-950 dark:text-slate-950 font-black" 
+                  : "text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/60 dark:border-slate-700/60"
               )}
             >
+              {isActive && (
+                <motion.div
+                  layoutId="activeCategoryPill"
+                  className="absolute inset-0 bg-amber-400 dark:bg-amber-400 rounded-2xl shadow-md -z-10"
+                  transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+                />
+              )}
               {getCategoryIcon(cat.id)}
               <span>{cat.name[language] || cat.name.en}</span>
             </button>
@@ -80,3 +97,4 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, acti
     </div>
   );
 };
+

@@ -133,7 +133,7 @@ export default function StockPage() {
             <Package className="w-8 h-8 text-sky-500" />
             {t.admin.stock.title}
           </h1>
-          <p className="text-sm text-slate-500">{stock.length} råvarer registreret</p>
+          <p className="text-sm text-slate-500">{stock.length} {t.admin.stock.subtitle}</p>
         </div>
         <button
           onClick={openAdd}
@@ -176,7 +176,7 @@ export default function StockPage() {
                   <tr key={item.id} className={cn(isCritical && (isDark ? "bg-red-950/20" : "bg-red-50/70"))}>
                     <td className="p-4">
                       <div className="font-bold text-slate-900 dark:text-white">{item.name[language] || item.name.en}</div>
-                      <div className="text-xs text-slate-500">Kritisk grænse: {item.criticalLevel} {item.unit}</div>
+                      <div className="text-xs text-slate-500">{t.admin.stock.criticalLevelPrefix} {item.criticalLevel} {item.unit}</div>
                     </td>
                     <td className="p-4 font-medium text-slate-600 dark:text-slate-400">{item.category}</td>
                     <td className="p-4">
@@ -242,23 +242,23 @@ export default function StockPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">Dansk Navn (DA)</label>
-                  <input required type="text" value={nameDa} onChange={e => setNameDa(e.target.value)} placeholder="f.eks. Kaffebønner" className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                  <label className="text-xs font-bold text-slate-500">{t.admin.stock.nameDa}</label>
+                  <input required type="text" value={nameDa} onChange={e => setNameDa(e.target.value)} placeholder={t.admin.stock.nameDaPlaceholder} className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
                 </div>
                 <div className="space-y-1">
-                  <label className="text-xs font-bold text-slate-500">English Name (EN)</label>
-                  <input required type="text" value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder="e.g. Coffee Beans" className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                  <label className="text-xs font-bold text-slate-500">{t.admin.stock.nameEn}</label>
+                  <input required type="text" value={nameEn} onChange={e => setNameEn(e.target.value)} placeholder={t.admin.stock.nameEnPlaceholder} className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500">{t.admin.stock.category}</label>
-                  <input required type="text" value={category} onChange={e => setCategory(e.target.value)} placeholder="Coffee / Dairy / Fish..." className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                  <input required type="text" value={category} onChange={e => setCategory(e.target.value)} placeholder={t.admin.stock.categoryPlaceholder} className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
                 </div>
                 <div className="space-y-1">
                   <label className="text-xs font-bold text-slate-500">{t.admin.stock.unit}</label>
-                  <input required type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder="kg / liter / pcs..." className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                  <input required type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder={t.admin.stock.unitPlaceholder} className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
                 </div>
               </div>
 

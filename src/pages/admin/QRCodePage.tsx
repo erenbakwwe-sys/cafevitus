@@ -8,7 +8,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function QRCodePage() {
   const [tables, setTables] = useState<Table[]>([]);
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const origin = window.location.origin;
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export default function QRCodePage() {
       document.body.appendChild(downloadLink);
       downloadLink.click();
       document.body.removeChild(downloadLink);
-      toast.success(language === 'da' ? `Bord ${tableNumber} QR-kode downloadet` : `Table ${tableNumber} QR downloaded`);
+      toast.success(`${t.table.tableNumber} ${tableNumber} ${t.admin.qrCodes.downloadedToast}`);
     }
   };
 
@@ -41,17 +41,21 @@ export default function QRCodePage() {
         downloadQR(table.number);
       }, i * 250);
     });
-    toast.success(language === 'da' ? 'Downloader alle bord QR-koder...' : 'Downloading all table QR codes...');
+    toast.success(t.admin.qrCodes.downloadingAllToast);
   };
 
   const printQR = (tableNumber: string) => {
     const canvas = document.getElementById(`qr-table-${tableNumber}`) as HTMLCanvasElement;
     if (canvas) {
+      const printTitle = t.admin.qrCodes.printTitle;
+      const printBadge = t.admin.qrCodes.printBadge;
+      const printInstruction = t.admin.qrCodes.printInstruction;
+
       const windowContent = `
         <!DOCTYPE html>
         <html>
         <head>
-          <title>Cafe Vitus - Bord ${tableNumber}</title>
+          <title>${printTitle} ${tableNumber}</title>
           <style>
             body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; text-align: center; }
             .card { border: 3px solid #000; border-radius: 24px; padding: 40px; max-width: 320px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
@@ -68,9 +72,9 @@ export default function QRCodePage() {
             <p class="sub">Snekkersten Havn • Danmark</p>
             <img src="${canvas.toDataURL()}"/>
             <div>
-              <div class="badge">BORD ${tableNumber}</div>
+              <div class="badge">${printBadge} ${tableNumber}</div>
             </div>
-            <p class="instruction">Scan QR-koden for at se menukortet og bestille direkte til bordet.</p>
+            <p class="instruction">${printInstruction}</p>
           </div>
         </body>
         </html>
@@ -96,12 +100,10 @@ export default function QRCodePage() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-black Outfit flex items-center gap-3 text-slate-900 dark:text-white">
             <QrCode className="w-8 h-8 text-amber-500" />
-            <span>{language === 'da' ? 'Bord-Specifikke QR Koder' : 'Table Dedicated QR Codes'}</span>
+            <span>{t.admin.qrCodes.tableSpecificTitle}</span>
           </h1>
           <p className="text-xs sm:text-sm text-slate-500 font-semibold mt-1">
-            {language === 'da' 
-              ? 'Hvert bord har sin egen unikke QR-kode. Når kunden scanner, genkendes bordet automatisk!' 
-              : 'Each table has a dedicated QR code. When scanned, the table is automatically recognized!'}
+            {t.admin.qrCodes.description}
           </p>
         </div>
         
@@ -112,7 +114,7 @@ export default function QRCodePage() {
             className="flex items-center gap-2 bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 px-4 py-2.5 rounded-xl font-black text-xs transition-colors cursor-pointer"
           >
             <Printer className="w-4 h-4" /> 
-            <span>{language === 'da' ? 'Udskriv Alle' : 'Print All'}</span>
+            <span>{t.admin.qrCodes.printAll}</span>
           </button>
           <button 
             type="button"
@@ -120,7 +122,7 @@ export default function QRCodePage() {
             className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 dark:bg-amber-500 dark:hover:bg-amber-600 text-white dark:text-slate-950 px-4 py-2.5 rounded-xl font-black text-xs transition-colors shadow-md cursor-pointer"
           >
             <Download className="w-4 h-4" /> 
-            <span>{language === 'da' ? 'Download Alle' : 'Download All'}</span>
+            <span>{t.admin.qrCodes.downloadAll}</span>
           </button>
         </div>
       </div>
@@ -155,11 +157,11 @@ export default function QRCodePage() {
               {/* Big Bold Dedicated Table Badge */}
               <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-slate-950 text-white dark:bg-amber-500 dark:text-slate-950 font-black text-base mb-4 shadow-sm">
                 <MapPin className="w-4 h-4" />
-                <span>Bord {table.number}</span>
+                <span>{t.table.tableNumber} {table.number}</span>
               </div>
 
               <p className="text-[11px] text-slate-400 font-semibold mb-5 print:hidden">
-                {language === 'da' ? 'Scanner låses automatisk til Bord ' + table.number : 'Scans automatically lock to Table ' + table.number}
+                {`${t.admin.qrCodes.lockedNotice} ${table.number}`}
               </p>
 
               {/* Action Buttons */}
@@ -170,7 +172,7 @@ export default function QRCodePage() {
                   className="flex-1 flex justify-center items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 rounded-xl transition-colors font-bold text-xs cursor-pointer"
                 >
                   <Download className="w-3.5 h-3.5" /> 
-                  <span>{language === 'da' ? 'Gem' : 'Save'}</span>
+                  <span>{t.admin.qrCodes.downloadSingle}</span>
                 </button>
                 <button 
                   type="button"
@@ -178,7 +180,7 @@ export default function QRCodePage() {
                   className="flex-1 flex justify-center items-center gap-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 rounded-xl transition-colors font-bold text-xs cursor-pointer"
                 >
                   <Printer className="w-3.5 h-3.5" /> 
-                  <span>{language === 'da' ? 'Udskriv' : 'Print'}</span>
+                  <span>{t.admin.qrCodes.printSingle}</span>
                 </button>
               </div>
             </div>

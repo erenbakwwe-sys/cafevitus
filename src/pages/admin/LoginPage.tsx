@@ -81,7 +81,7 @@ export default function LoginPage() {
           </div>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white Outfit">{t.admin.title}</h1>
           <p className="text-slate-500 dark:text-slate-400 text-center text-sm mt-2">
-            {t.admin.enterPin} <span className="font-bold text-sky-500">(Standard: 1234)</span>
+            {t.admin.enterPin} <span className="font-bold text-sky-500">{t.admin.defaultPinHint}</span>
           </p>
         </div>
 

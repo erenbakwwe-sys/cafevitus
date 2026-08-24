@@ -138,7 +138,7 @@ export default function ExpensesPage() {
             <Wallet className="w-8 h-8 text-sky-500" />
             {t.admin.expenses.title}
           </h1>
-          <p className="text-sm text-slate-500">Finansiel oversigt & drift</p>
+          <p className="text-sm text-slate-500">{t.admin.expenses.subtitle}</p>
         </div>
         <button
           onClick={openAdd}
@@ -212,7 +212,7 @@ export default function ExpensesPage() {
 
       {/* Chart Section */}
       <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
-        <h3 className="text-lg font-bold mb-4 Outfit">Indtægter vs Udgifter</h3>
+        <h3 className="text-lg font-bold mb-4 Outfit">{t.admin.expenses.chartHeading}</h3>
         <div className="h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
@@ -241,7 +241,7 @@ export default function ExpensesPage() {
       <div className={cn("rounded-3xl border overflow-hidden shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
         <div className="p-6 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center">
           <h3 className="text-lg font-bold Outfit">{t.admin.expenses.expense}</h3>
-          <span className="text-xs font-bold text-slate-500">{filteredExpenses.length} poster</span>
+          <span className="text-xs font-bold text-slate-500">{filteredExpenses.length} {t.admin.expenses.entriesCount}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-left">
@@ -299,7 +299,7 @@ export default function ExpensesPage() {
           >
             <div className="flex justify-between items-center mb-6 pb-3 border-b border-slate-200 dark:border-slate-800">
               <h2 className="text-xl font-bold Outfit">
-                {editingItem ? 'Rediger Udgift' : t.admin.expenses.addExpense}
+                {editingItem ? t.admin.expenses.editExpense : t.admin.expenses.addExpense}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full">
                 <X size={20} />
@@ -309,7 +309,7 @@ export default function ExpensesPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-1">
                 <label className="text-xs font-bold text-slate-500">{t.admin.expenses.description}</label>
-                <input required type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder="f.eks. Mælk & Fløde levering" className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
+                <input required type="text" value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t.admin.expenses.descPlaceholder} className={cn("w-full p-3 rounded-xl border outline-none text-sm font-medium", isDark ? "bg-slate-800 border-slate-700" : "bg-slate-50 border-slate-200")} />
               </div>
 
               <div className="grid grid-cols-2 gap-4">

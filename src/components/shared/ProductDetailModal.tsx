@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Minus, Plus, ShoppingBag, Check } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Minus, Plus, ShoppingBag, Check, Sparkles, X } from 'lucide-react';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
 import { Textarea } from '../ui/Input';
@@ -101,17 +102,21 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
       className="p-0 overflow-hidden"
     >
       <div className="flex flex-col max-h-[88vh] sm:max-h-[85vh]">
-        {/* Header Image */}
+        {/* Header Image with Rich Vignette and Close Button */}
         {item.image && (
-          <div className="relative w-full h-44 sm:h-60 shrink-0 bg-slate-100 dark:bg-slate-800">
+          <div className="relative w-full h-48 sm:h-64 shrink-0 bg-slate-900 overflow-hidden">
             <img 
               src={item.image} 
               alt={item.name[language] || item.name.en} 
               className="w-full h-full object-cover" 
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-            <div className="absolute bottom-3 left-4 right-4">
-              <h2 className="text-xl sm:text-2xl font-black text-white drop-shadow-md">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+            
+            <div className="absolute bottom-4 left-5 right-5">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-amber-300 bg-amber-400/20 px-2.5 py-0.5 rounded-full backdrop-blur-md inline-block mb-1 border border-amber-300/30">
+                Cafe Vitus Snekkersten
+              </span>
+              <h2 className="text-xl sm:text-2xl font-extrabold text-white drop-shadow-md font-serif-luxury leading-tight">
                 {item.name[language] || item.name.en}
               </h2>
             </div>
@@ -119,31 +124,39 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
         )}
         
         {/* Content Body */}
-        <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6">
+        <div className="flex-1 overflow-y-auto p-5 sm:p-7 space-y-6 custom-scrollbar">
           {!item.image && (
-            <h2 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">
+            <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white font-serif-luxury">
               {item.name[language] || item.name.en}
             </h2>
           )}
           
-          <div className="flex justify-between items-start gap-4">
-            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+          <div className="flex justify-between items-start gap-4 pb-4 border-b border-slate-100 dark:border-slate-800">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-medium">
               {item.description[language] || item.description.en}
             </p>
-            <span className="text-lg sm:text-xl font-black text-slate-950 dark:text-white whitespace-nowrap">
-              {formatCurrency(item.price)}
-            </span>
+            <div className="text-right shrink-0">
+              <span className="text-[10px] uppercase tracking-wider font-extrabold text-slate-400 block">{t.productCard.basePrice}</span>
+              <span className="text-lg sm:text-xl font-black text-slate-950 dark:text-white whitespace-nowrap Outfit">
+                {formatCurrency(item.price)}
+              </span>
+            </div>
           </div>
 
+          {/* Customization Options */}
           {item.customizations?.map(group => (
-            <div key={group.id} className="space-y-3 pt-2">
+            <div key={group.id} className="space-y-3 pt-1">
               <div className="flex items-baseline justify-between">
-                <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white">
-                  {group.name[language] || group.name.en}
+                <h4 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>{group.name[language] || group.name.en}</span>
                 </h4>
-                {group.required && (
-                  <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-2 py-0.5 rounded-full uppercase tracking-wider">
+                {group.required ? (
+                  <span className="text-[10px] font-extrabold text-amber-700 dark:text-amber-400 bg-amber-500/15 dark:bg-amber-950/60 px-2.5 py-0.5 rounded-full uppercase tracking-wider border border-amber-500/30">
                     {t.common.required}
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                    {t.common.optional}
                   </span>
                 )}
               </div>
@@ -154,35 +167,37 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
                   const isRadio = group.type === 'single';
                   
                   return (
-                    <button
+                    <motion.button
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.99 }}
                       key={option.id}
                       type="button"
                       onClick={() => toggleOption(group.id, option.id, group.type)}
                       className={cn(
-                        "flex items-center justify-between p-3 sm:p-3.5 rounded-2xl border transition-all text-left cursor-pointer min-h-[48px]",
+                        "flex items-center justify-between p-3.5 sm:p-4 rounded-2xl border transition-all text-left cursor-pointer min-h-[50px]",
                         isSelected 
-                          ? "border-amber-500 bg-amber-500/10 dark:bg-amber-500/15 shadow-xs"
-                          : "border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-900"
+                          ? "border-amber-400 bg-amber-400/15 dark:bg-amber-400/20 shadow-xs ring-1 ring-amber-400/40"
+                          : "border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-slate-50/50 dark:bg-slate-900/60"
                       )}
                     >
                       <div className="flex items-center gap-3">
                         <div className={cn(
                           "flex items-center justify-center shrink-0 border transition-all",
                           isRadio ? "w-5 h-5 rounded-full" : "w-5 h-5 rounded-lg",
-                          isSelected ? "border-amber-500 bg-amber-500 text-slate-950" : "border-slate-300 dark:border-slate-600"
+                          isSelected ? "border-amber-400 bg-amber-400 text-slate-950 shadow-xs" : "border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
                         )}>
                           {isSelected && <Check className="w-3.5 h-3.5 stroke-[3]" />}
                         </div>
-                        <span className={cn("text-xs sm:text-sm font-bold", isSelected ? "text-slate-950 dark:text-white" : "text-slate-700 dark:text-slate-300")}>
+                        <span className={cn("text-xs sm:text-sm font-extrabold", isSelected ? "text-slate-950 dark:text-white" : "text-slate-700 dark:text-slate-300")}>
                           {option.name[language] || option.name.en}
                         </span>
                       </div>
                       {option.price > 0 ? (
-                        <span className="text-xs font-extrabold text-slate-500 dark:text-slate-400">
+                        <span className="text-xs font-black text-amber-600 dark:text-amber-400 Outfit">
                           +{formatCurrency(option.price)}
                         </span>
                       ) : null}
-                    </button>
+                    </motion.button>
                   );
                 })}
               </div>
@@ -195,31 +210,33 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
               placeholder={t.menu.specialNotePlaceholder}
               value={notes}
               onChange={e => setNotes(e.target.value)}
-              className="resize-none text-xs"
+              className="resize-none text-xs rounded-2xl"
             />
           </div>
         </div>
 
         {/* Sticky Footer actions with safe area padding */}
-        <div className="sticky bottom-0 left-0 right-0 p-4 sm:p-5 bg-white/95 dark:bg-[#0E172A]/95 backdrop-blur-xl border-t border-slate-200 dark:border-slate-800 flex items-center gap-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
+        <div className="sticky bottom-0 left-0 right-0 p-4 sm:p-5 bg-white/90 dark:bg-[#0E172A]/90 backdrop-blur-2xl border-t border-slate-200 dark:border-slate-800 flex items-center gap-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="flex items-center justify-between bg-slate-100 dark:bg-slate-800 rounded-2xl p-1 shrink-0 border border-slate-200 dark:border-slate-700">
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85 }}
               type="button"
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="w-9 h-9 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+              className="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
             >
               <Minus className="w-4 h-4" />
-            </button>
-            <span className="w-8 text-center font-black text-sm text-slate-900 dark:text-white">
+            </motion.button>
+            <span className="w-9 text-center font-black text-sm text-slate-950 dark:text-white Outfit">
               {quantity}
             </span>
-            <button
+            <motion.button
+              whileTap={{ scale: 0.85 }}
               type="button"
               onClick={() => setQuantity(quantity + 1)}
-              className="w-9 h-9 flex items-center justify-center rounded-xl bg-amber-500 text-slate-950 font-bold hover:bg-amber-600 transition-colors cursor-pointer shadow-xs"
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-amber-400 hover:bg-amber-500 text-slate-950 font-bold transition-colors cursor-pointer shadow-xs"
             >
-              <Plus className="w-4 h-4" />
-            </button>
+              <Plus className="w-4 h-4 stroke-[2.5]" />
+            </motion.button>
           </div>
           
           <Button
@@ -228,7 +245,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
             onClick={handleAddToCart}
             disabled={isAddToCartDisabled}
             icon={<ShoppingBag className="w-4 h-4" />}
-            className="flex-1 text-xs sm:text-sm font-black py-3.5 rounded-2xl bg-slate-950 hover:bg-slate-900 dark:bg-white dark:text-slate-950"
+            className="flex-1 text-xs sm:text-sm font-black py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 dark:bg-amber-400 dark:hover:bg-amber-500 dark:text-slate-950 shadow-lg cursor-pointer"
           >
             <span>{t.menu.addToCart} • {formatCurrency(calculateTotal())}</span>
           </Button>
@@ -237,3 +254,4 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
     </Modal>
   );
 };
+

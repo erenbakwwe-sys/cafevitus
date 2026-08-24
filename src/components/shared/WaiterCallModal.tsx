@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Receipt, Droplets, HelpCircle, MessageSquare, X, Send, Bell } from 'lucide-react';
+import { Receipt, Droplets, HelpCircle, MessageSquare, X, Send, Bell, Sparkles } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
@@ -72,17 +72,17 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/65 backdrop-blur-md"
           />
 
-          {/* Bottom Sheet Card */}
+          {/* Modal Card */}
           <motion.div
             initial={{ y: '100%', opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: '100%', opacity: 0 }}
             transition={{ type: 'spring', damping: 26, stiffness: 260 }}
-            className={`relative w-full max-w-md overflow-hidden rounded-t-[32px] sm:rounded-3xl shadow-2xl z-10 ${
-              isDark ? 'bg-[#0E172A] text-white border-t border-slate-800' : 'bg-white text-slate-900 border-t border-slate-200'
+            className={`relative w-full max-w-md overflow-hidden rounded-t-[32px] sm:rounded-[2rem] shadow-2xl z-10 border ${
+              isDark ? 'bg-[#0E172A] text-white border-slate-800' : 'bg-white text-slate-900 border-slate-200'
             }`}
           >
             {/* Mobile Drag Pill */}
@@ -90,44 +90,49 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
               <div className="w-12 h-1.5 rounded-full bg-slate-300 dark:bg-slate-700" />
             </div>
 
-            <div className="flex items-center justify-between border-b border-slate-200/80 p-4 sm:p-5 dark:border-slate-800">
-              <div className="flex items-center space-x-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center">
+            <div className="flex items-center justify-between border-b border-slate-200/80 p-5 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-400/20 text-amber-500 flex items-center justify-center shadow-inner">
                   <Bell className="h-5 w-5 animate-pulse" />
                 </div>
                 <div>
-                  <h2 className="text-lg sm:text-xl font-black">{t.waiter.callWaiter}</h2>
-                  <p className="text-[11px] text-slate-400 font-bold">Bord {tableNumber || tableId || '5'}</p>
+                  <h2 className="text-lg sm:text-xl font-extrabold font-serif-luxury">{t.waiter.callWaiter}</h2>
+                  <p className="text-[11px] text-slate-400 font-bold flex items-center gap-1">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-beacon" />
+                    {t.table.tableNumber} {tableNumber || tableId || '5'}
+                  </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-full p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                className="rounded-full p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
 
             <div className="p-5 sm:p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
-              <p className="text-xs font-bold text-slate-500 mb-3">{t.waiter.selectReason}</p>
-              <div className="mb-5 grid grid-cols-2 gap-2.5">
+              <p className="text-xs font-bold text-slate-500 mb-3 uppercase tracking-wider">{t.waiter.selectReason}</p>
+              <div className="mb-5 grid grid-cols-2 gap-3">
                 {reasons.map((reason) => (
-                  <button
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.96 }}
                     key={reason.id}
                     type="button"
                     onClick={() => setSelectedReason(reason.id)}
-                    className={`flex flex-col items-center justify-center p-3.5 rounded-2xl transition-all cursor-pointer min-h-[85px] ${
+                    className={`flex flex-col items-center justify-center p-4 rounded-2xl transition-all cursor-pointer min-h-[90px] border ${
                       selectedReason === reason.id
-                        ? 'bg-amber-500 text-slate-950 ring-2 ring-amber-500 shadow-md font-bold'
+                        ? 'bg-amber-400 text-slate-950 border-amber-400 shadow-md font-black ring-2 ring-amber-400/40'
                         : isDark
-                        ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border border-slate-700/60'
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200/80'
+                        ? 'bg-slate-800/80 text-slate-300 hover:bg-slate-800 border-slate-700/80'
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border-slate-200/90'
                     }`}
                   >
                     <div className="mb-2">{reason.icon}</div>
-                    <span className="text-xs font-bold text-center leading-tight">{reason.label}</span>
-                  </button>
+                    <span className="text-xs font-extrabold text-center leading-tight">{reason.label}</span>
+                  </motion.button>
                 ))}
               </div>
 
@@ -142,7 +147,7 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder={t.waiter.messagePlaceholder}
-                    className={`w-full rounded-2xl p-3 text-xs outline-none ring-1 transition-shadow focus:ring-2 focus:ring-amber-500 ${
+                    className={`w-full rounded-2xl p-3 text-xs outline-none ring-1 transition-shadow focus:ring-2 focus:ring-amber-400 ${
                       isDark
                         ? 'bg-slate-800/80 ring-slate-700 text-white placeholder-slate-500'
                         : 'bg-slate-50 ring-slate-200 text-slate-900 placeholder-slate-400'
@@ -152,21 +157,23 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
                 </motion.div>
               )}
 
-              <button
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.97 }}
                 type="button"
                 onClick={handleSend}
                 disabled={!selectedReason || cooldown > 0}
-                className="flex w-full items-center justify-center space-x-2 rounded-2xl bg-amber-500 hover:bg-amber-600 p-3.5 sm:p-4 font-black text-slate-950 text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer min-h-[48px]"
+                className="flex w-full items-center justify-center space-x-2 rounded-2xl bg-amber-400 hover:bg-amber-500 p-4 font-black text-slate-950 text-xs sm:text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md cursor-pointer min-h-[50px]"
               >
                 {cooldown > 0 ? (
                   <span>{t.waiter.cooldownMessage} ({cooldown}s)</span>
                 ) : (
                   <>
                     <span>{t.waiter.callWaiter}</span>
-                    <Send className="h-4 w-4" />
+                    <Send className="h-4 w-4 stroke-[2.5]" />
                   </>
                 )}
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         </div>
@@ -174,3 +181,4 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
     </AnimatePresence>
   );
 }
+

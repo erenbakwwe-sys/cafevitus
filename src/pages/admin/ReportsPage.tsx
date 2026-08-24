@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { BarChart3, DollarSign, ShoppingBag, TrendingUp, Clock } from 'lucide-react';
+import { BarChart3, DollarSign, ShoppingBag, TrendingUp, Clock, Sparkles, Award, Coffee } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
@@ -66,7 +67,7 @@ export default function ReportsPage() {
     });
 
     if (dataMap.size === 0) {
-      return [
+      return language === 'da' ? [
         { date: 'Man', revenue: 2450 },
         { date: 'Tirs', revenue: 3890 },
         { date: 'Ons', revenue: 4120 },
@@ -74,6 +75,14 @@ export default function ReportsPage() {
         { date: 'Fre', revenue: 8400 },
         { date: 'Lør', revenue: 11200 },
         { date: 'Søn', revenue: 9800 },
+      ] : [
+        { date: 'Mon', revenue: 2450 },
+        { date: 'Tue', revenue: 3890 },
+        { date: 'Wed', revenue: 4120 },
+        { date: 'Thu', revenue: 5200 },
+        { date: 'Fri', revenue: 8400 },
+        { date: 'Sat', revenue: 11200 },
+        { date: 'Sun', revenue: 9800 },
       ];
     }
 
@@ -91,12 +100,18 @@ export default function ReportsPage() {
     });
 
     if (items.size === 0) {
-      return [
+      return language === 'da' ? [
         { name: 'Røget Laks Smørrebrød', quantity: 48 },
         { name: 'Stjerneskud med Rejer', quantity: 39 },
         { name: 'Havne Aperol Spritz', quantity: 35 },
         { name: 'Barista Cappuccino', quantity: 64 },
         { name: 'Belgisk Vaffel med Is', quantity: 27 },
+      ] : [
+        { name: 'Smoked Salmon Smørrebrød', quantity: 48 },
+        { name: 'Crispy Plaice Fillet & Prawns', quantity: 39 },
+        { name: 'Harbor Aperol Spritz', quantity: 35 },
+        { name: 'Barista Cappuccino', quantity: 64 },
+        { name: 'Belgian Waffle with Ice Cream', quantity: 27 },
       ];
     }
 
@@ -116,7 +131,6 @@ export default function ReportsPage() {
       }
     });
 
-    // Add demo variation if empty
     const hasData = hours.some((h) => h.count > 0);
     if (!hasData) {
       return [
@@ -146,32 +160,34 @@ export default function ReportsPage() {
     const totalCount = methods.cash + methods.card + methods.counter;
     if (totalCount === 0) {
       return [
-        { name: t.admin.reports.card, value: 72, color: '#0ea5e9' },
+        { name: t.admin.reports.card, value: 72, color: '#f59e0b' },
         { name: t.admin.reports.cash, value: 18, color: '#10b981' },
-        { name: t.admin.reports.counter, value: 10, color: '#f59e0b' },
+        { name: t.admin.reports.counter, value: 10, color: '#38bdf8' },
       ];
     }
 
     return [
-      { name: t.admin.reports.card, value: methods.card, color: '#0ea5e9' },
+      { name: t.admin.reports.card, value: methods.card, color: '#f59e0b' },
       { name: t.admin.reports.cash, value: methods.cash, color: '#10b981' },
-      { name: t.admin.reports.counter, value: methods.counter, color: '#f59e0b' },
+      { name: t.admin.reports.counter, value: methods.counter, color: '#38bdf8' },
     ];
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-7xl mx-auto space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold Outfit text-slate-900 dark:text-white flex items-center gap-3">
-            <BarChart3 className="w-8 h-8 text-sky-500" />
-            {t.admin.reports.title}
+          <h1 className="text-2xl sm:text-4xl font-extrabold font-serif-luxury text-slate-900 dark:text-white flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-400/20 text-amber-500 flex items-center justify-center shadow-inner">
+              <BarChart3 className="w-6 h-6" />
+            </div>
+            <span>{t.admin.reports.title}</span>
           </h1>
-          <p className="text-sm text-slate-500">Salgsstatistik, ciro & adfærd</p>
+          <p className="text-xs sm:text-sm text-slate-500 font-bold mt-1">{t.admin.reports.subtitle}</p>
         </div>
 
         {/* Date Range Tabs */}
-        <div className="flex gap-2 p-1.5 bg-slate-100 dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700">
+        <div className="flex gap-1.5 p-1.5 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-xs">
           {[
             { id: 'today', label: t.admin.reports.today },
             { id: '7days', label: t.admin.reports.last7Days },
@@ -179,11 +195,12 @@ export default function ReportsPage() {
           ].map((tab) => (
             <button
               key={tab.id}
+              type="button"
               onClick={() => setDateRange(tab.id as DateRange)}
               className={cn(
-                "px-4 py-2 rounded-xl text-xs font-bold transition-all",
+                "px-3.5 py-2 rounded-xl text-xs font-black transition-all cursor-pointer",
                 dateRange === tab.id
-                  ? "bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm"
+                  ? "bg-amber-400 text-slate-950 shadow-sm font-black"
                   : "text-slate-500 hover:text-slate-900 dark:hover:text-white"
               )}
             >
@@ -194,56 +211,71 @@ export default function ReportsPage() {
       </div>
 
       {/* Summary Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
+        <motion.div 
+          whileHover={{ y: -3 }}
+          className={cn("p-6 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}
+        >
           <div className="flex items-center gap-4">
-            <div className="p-3.5 bg-sky-500/10 dark:bg-sky-500/20 text-sky-500 rounded-2xl">
+            <div className="p-3.5 bg-amber-400/20 text-amber-500 rounded-2xl shadow-inner">
               <DollarSign size={28} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">{t.admin.reports.totalRevenue}</div>
-              <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{formatCurrency(totalRevenue || 45290)}</div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">{t.admin.reports.totalRevenue}</div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-0.5 Outfit text-amber-600 dark:text-amber-400">
+                {formatCurrency(totalRevenue || 45290)}
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
+        <motion.div 
+          whileHover={{ y: -3 }}
+          className={cn("p-6 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}
+        >
           <div className="flex items-center gap-4">
-            <div className="p-3.5 bg-amber-500/10 dark:bg-amber-500/20 text-amber-500 rounded-2xl">
+            <div className="p-3.5 bg-sky-500/20 text-sky-500 rounded-2xl shadow-inner">
               <ShoppingBag size={28} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">{t.admin.reports.totalOrders}</div>
-              <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{totalOrders || 184}</div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">{t.admin.reports.totalOrders}</div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-0.5 Outfit">
+                {totalOrders || 184}
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
+        <motion.div 
+          whileHover={{ y: -3 }}
+          className={cn("p-6 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}
+        >
           <div className="flex items-center gap-4">
-            <div className="p-3.5 bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-500 rounded-2xl">
+            <div className="p-3.5 bg-emerald-500/20 text-emerald-500 rounded-2xl shadow-inner">
               <TrendingUp size={28} />
             </div>
             <div>
-              <div className="text-xs font-bold uppercase tracking-wider text-slate-400">{t.admin.reports.averageOrderValue}</div>
-              <div className="text-2xl font-black text-slate-900 dark:text-white mt-0.5">{formatCurrency(avgOrderValue || 246.14)}</div>
+              <div className="text-[11px] font-extrabold uppercase tracking-wider text-slate-400">{t.admin.reports.averageOrderValue}</div>
+              <div className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white mt-0.5 Outfit">
+                {formatCurrency(avgOrderValue || 246.14)}
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* Charts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Revenue Area Chart */}
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
-          <h3 className="text-lg font-bold mb-4 Outfit">{t.admin.reports.dailyRevenue}</h3>
+        <div className={cn("p-6 sm:p-7 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}>
+          <h3 className="text-lg font-extrabold mb-4 font-serif-luxury text-slate-900 dark:text-white">{t.admin.reports.dailyRevenue}</h3>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={getRevenueData()} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#0ea5e9" stopOpacity={0.5} />
-                    <stop offset="95%" stopColor="#0ea5e9" stopOpacity={0.0} />
+                    <stop offset="5%" stopColor="#f59e0b" stopOpacity={0.5} />
+                    <stop offset="95%" stopColor="#f59e0b" stopOpacity={0.0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
@@ -252,20 +284,20 @@ export default function ReportsPage() {
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     border: '1px solid rgba(150,150,150,0.2)',
                     fontWeight: 'bold'
                   }} 
                 />
-                <Area type="monotone" dataKey="revenue" stroke="#0ea5e9" strokeWidth={3} fill="url(#revGrad)" />
+                <Area type="monotone" dataKey="revenue" stroke="#f59e0b" strokeWidth={3} fill="url(#revGrad)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Top Selling Items BarChart */}
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
-          <h3 className="text-lg font-bold mb-4 Outfit">{t.admin.reports.topSellingItems}</h3>
+        <div className={cn("p-6 sm:p-7 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}>
+          <h3 className="text-lg font-extrabold mb-4 font-serif-luxury text-slate-900 dark:text-white">{t.admin.reports.topSellingItems}</h3>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={getTopItems()} layout="vertical" margin={{ top: 10, right: 20, left: 40, bottom: 0 }}>
@@ -275,7 +307,7 @@ export default function ReportsPage() {
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     border: '1px solid rgba(150,150,150,0.2)',
                     fontWeight: 'bold'
                   }} 
@@ -287,8 +319,8 @@ export default function ReportsPage() {
         </div>
 
         {/* Peak Hours LineChart */}
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
-          <h3 className="text-lg font-bold mb-4 Outfit">{t.admin.reports.peakHours}</h3>
+        <div className={cn("p-6 sm:p-7 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}>
+          <h3 className="text-lg font-extrabold mb-4 font-serif-luxury text-slate-900 dark:text-white">{t.admin.reports.peakHours}</h3>
           <div className="h-72 w-full">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={getPeakHours()} margin={{ top: 10, right: 20, left: -10, bottom: 0 }}>
@@ -298,7 +330,7 @@ export default function ReportsPage() {
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     border: '1px solid rgba(150,150,150,0.2)',
                     fontWeight: 'bold'
                   }} 
@@ -310,8 +342,8 @@ export default function ReportsPage() {
         </div>
 
         {/* Payment Methods PieChart */}
-        <div className={cn("p-6 rounded-3xl border shadow-sm", isDark ? "bg-slate-900 border-slate-800" : "bg-white border-slate-200")}>
-          <h3 className="text-lg font-bold mb-4 Outfit">{t.admin.reports.paymentMethods}</h3>
+        <div className={cn("p-6 sm:p-7 rounded-3xl border shadow-md backdrop-blur-xl", isDark ? "bg-[#0E172A]/90 border-slate-800" : "bg-white/90 border-slate-200/90")}>
+          <h3 className="text-lg font-extrabold mb-4 font-serif-luxury text-slate-900 dark:text-white">{t.admin.reports.paymentMethods}</h3>
           <div className="h-72 w-full flex items-center justify-center">
             <ResponsiveContainer width="100%" height="100%">
               <PieChart>
@@ -332,7 +364,7 @@ export default function ReportsPage() {
                 <Tooltip 
                   contentStyle={{ 
                     backgroundColor: isDark ? '#0f172a' : '#ffffff', 
-                    borderRadius: '12px',
+                    borderRadius: '16px',
                     border: '1px solid rgba(150,150,150,0.2)',
                     fontWeight: 'bold'
                   }} 
@@ -345,3 +377,4 @@ export default function ReportsPage() {
     </div>
   );
 }
+
