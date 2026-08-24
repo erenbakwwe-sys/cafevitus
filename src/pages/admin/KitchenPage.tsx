@@ -168,7 +168,7 @@ export default function KitchenPage() {
   };
 
   const Column = ({ title, columnOrders, color }: { title: string; columnOrders: Order[]; color: string }) => (
-    <div className="flex flex-col h-full bg-slate-100/70 dark:bg-[#070C18]/70 backdrop-blur-xl rounded-[2rem] p-4.5 overflow-hidden border border-slate-200/70 dark:border-slate-800 shadow-sm">
+    <div className="flex flex-col h-[420px] md:h-full bg-slate-100/70 dark:bg-[#070C18]/70 backdrop-blur-xl rounded-[2rem] p-4.5 overflow-hidden border border-slate-200/70 dark:border-slate-800 shadow-sm">
       <div className="flex items-center justify-between mb-4 px-2">
         <h2 className="text-lg font-extrabold flex items-center gap-2.5 font-serif-luxury text-slate-900 dark:text-white">
           <div className={cn("w-3 h-3 rounded-full animate-beacon", color)} />
@@ -178,7 +178,7 @@ export default function KitchenPage() {
           {columnOrders.length}
         </span>
       </div>
-      <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-16 custom-scrollbar">
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 pb-4 custom-scrollbar">
         <AnimatePresence>
           {columnOrders.map((order) => (
             <OrderCard key={order.id} order={order} />
@@ -194,7 +194,7 @@ export default function KitchenPage() {
   );
 
   return (
-    <div className="h-[calc(100vh-4rem)] lg:h-screen flex flex-col p-4 sm:p-6 max-w-[1600px] mx-auto">
+    <div className="min-h-[calc(100vh-4rem)] lg:h-screen flex flex-col p-4 sm:p-6 max-w-[1600px] mx-auto">
       <div className="flex justify-between items-center mb-6 shrink-0">
         <div className="flex items-center gap-3">
           <div className="p-3 bg-amber-400/20 rounded-2xl text-amber-600 dark:text-amber-400 shadow-inner">

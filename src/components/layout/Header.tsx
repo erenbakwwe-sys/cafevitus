@@ -36,12 +36,12 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tabl
 
   return (
     <header className="sticky top-0 z-40 w-full shadow-2xs">
-      {/* Top Universal Mode Bar (Always visible on Desktop, shown on mobile if on admin page) */}
-      <div className={cn("bg-slate-950 text-white px-3 sm:px-4 py-1.5 border-b border-slate-800/80 backdrop-blur-md", !isAdminPath && "hidden md:block")}>
+      {/* Top Universal Mode Bar (Always visible on mobile & desktop with smooth horizontal scroll) */}
+      <div className="bg-slate-950 text-white px-2.5 sm:px-4 py-1.5 border-b border-slate-800/80 backdrop-blur-md">
         <div className="max-w-6xl mx-auto flex items-center justify-between gap-2 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-beacon" />
-            <span className="font-black text-xs text-slate-200 mr-1 hidden sm:inline tracking-wide">Cafe Vitus Live:</span>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="inline-block w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-emerald-400 animate-beacon" />
+            <span className="font-black text-[11px] sm:text-xs text-slate-200 mr-1 hidden sm:inline tracking-wide">Cafe Vitus Live:</span>
           </div>
 
           <div className="flex items-center gap-1 shrink-0">
@@ -54,7 +54,7 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tabl
                   type="button"
                   onClick={() => navigate(mode.path)}
                   className={cn(
-                    "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
+                    "flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap",
                     isActive
                       ? "bg-amber-400 text-slate-950 shadow-md font-black"
                       : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white"
@@ -112,7 +112,26 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tabl
 
 
             {/* Action Buttons with high-touch targets */}
-            <div className="flex items-center gap-1.5 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2.5">
+              {/* Admin / Staff Quick Button */}
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                type="button"
+                onClick={() => navigate('/admin')}
+                className={cn(
+                  "min-h-[40px] px-2.5 sm:px-3 py-1.5 rounded-2xl text-[11px] sm:text-xs font-black transition-colors cursor-pointer flex items-center justify-center gap-1.5 shadow-2xs",
+                  isAdminPath
+                    ? "bg-amber-400 text-slate-950 shadow-md font-black"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700"
+                )}
+                title={t.admin.title}
+                aria-label={t.admin.title}
+              >
+                <ShieldCheck className="w-4 h-4 text-amber-500 shrink-0" />
+                <span className="hidden xs:inline">Admin</span>
+              </motion.button>
+
               {/* Language Switch */}
               <motion.button
                 whileHover={{ scale: 1.05 }}

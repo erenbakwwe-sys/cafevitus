@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { 
-  LayoutGrid, ChefHat, UtensilsCrossed, QrCode, 
+  LayoutGrid, ChefHat, UtensilsCrossed, Utensils, QrCode, 
   Package, Wallet, Ticket, BarChart3, LogOut,
   Moon, Sun, Menu, X, Globe, Compass, Sparkles, Coffee
 } from 'lucide-react';
@@ -41,7 +41,7 @@ export default function AdminLayout() {
   const SidebarContent = () => (
     <div className="flex flex-col h-full bg-white/95 dark:bg-[#070C18]/95 backdrop-blur-2xl border-r border-slate-200/80 dark:border-slate-800/80 shadow-md">
       {/* Brand Header */}
-      <div className="p-6 border-b border-slate-100 dark:border-slate-800/80">
+      <div className="p-6 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-amber-500 to-amber-400 p-[2px] shadow-lg shadow-amber-500/20 shrink-0">
             <div className="w-full h-full bg-white dark:bg-slate-900 rounded-[14px] flex items-center justify-center">
@@ -58,10 +58,29 @@ export default function AdminLayout() {
             </p>
           </div>
         </div>
+
+        {/* Mobile Close Drawer Button */}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(false)}
+          className="lg:hidden p-2 text-slate-500 hover:text-slate-950 dark:text-slate-400 dark:hover:text-white rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          aria-label="Close menu"
+        >
+          <X className="w-5 h-5" />
+        </button>
       </div>
 
       {/* Navigation Links */}
       <nav className="flex-1 px-4 py-5 space-y-1.5 overflow-y-auto custom-scrollbar">
+        {/* Customer Menu Link */}
+        <NavLink
+          to="/"
+          className="flex items-center gap-3.5 px-4 py-3 rounded-2xl text-xs font-black text-amber-900 dark:text-amber-300 bg-amber-500/15 dark:bg-amber-950/50 hover:bg-amber-500/25 transition-all border border-amber-500/30 mb-3 shadow-2xs"
+        >
+          <Utensils className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+          <span>{t.admin.customerView}</span>
+        </NavLink>
+
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = item.end ? location.pathname === item.path : location.pathname.startsWith(item.path);
@@ -116,28 +135,49 @@ export default function AdminLayout() {
     </div>
   );
 
+  const mobileBottomNavItems = [
+    { path: '/admin', end: true, icon: LayoutGrid, label: t.admin.navigation.tables },
+    { path: '/admin/kitchen', icon: ChefHat, label: t.admin.navigation.kitchen },
+    { path: '/admin/menu', icon: UtensilsCrossed, label: t.admin.navigation.menu },
+    { path: '/admin/reports', icon: BarChart3, label: t.admin.navigation.reports },
+  ];
+
   return (
-    <div className="min-h-screen bg-[#F8F7F2] dark:bg-[#050A14] text-slate-900 dark:text-slate-100 flex">
+    <div className="min-h-screen bg-[#F8F7F2] dark:bg-[#050A14] text-slate-900 dark:text-slate-100 flex flex-col lg:flex-row">
       {/* Desktop Sidebar */}
       <aside className="hidden lg:block w-72 h-screen sticky top-0 shrink-0">
         <SidebarContent />
       </aside>
 
       {/* Mobile Top Navigation Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/90 dark:bg-[#070C18]/90 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 flex items-center justify-between px-4">
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-white/95 dark:bg-[#070C18]/95 backdrop-blur-xl border-b border-slate-200 dark:border-slate-800 z-40 flex items-center justify-between px-4">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-amber-400 flex items-center justify-center text-slate-950 font-black">
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-400 flex items-center justify-center text-slate-950 font-black shadow-md shadow-amber-500/20">
             <Coffee className="w-4 h-4" />
           </div>
-          <h1 className="text-lg font-extrabold font-serif-luxury text-slate-950 dark:text-white">Cafe Vitus Admin</h1>
+          <div>
+            <h1 className="text-base font-extrabold font-serif-luxury text-slate-950 dark:text-white leading-none">Cafe Vitus</h1>
+            <p className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider mt-0.5">{t.admin.staffPosPanel}</p>
+          </div>
         </div>
-        <button
-          type="button"
-          onClick={() => setMobileMenuOpen(true)}
-          className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+
+        <div className="flex items-center gap-1.5">
+          <NavLink
+            to="/"
+            className="px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-amber-800 dark:text-amber-300 bg-amber-500/15 dark:bg-amber-950/60 border border-amber-500/30 flex items-center gap-1"
+          >
+            <Utensils className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+            <span className="hidden xs:inline">{t.admin.customerView}</span>
+          </NavLink>
+          <button
+            type="button"
+            onClick={() => setMobileMenuOpen(true)}
+            className="p-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl cursor-pointer"
+            aria-label="Open menu"
+          >
+            <Menu className="w-6 h-6" />
+          </button>
+        </div>
       </div>
 
       {/* Mobile Drawer Overlay */}
@@ -165,9 +205,47 @@ export default function AdminLayout() {
       </AnimatePresence>
 
       {/* Main Content Viewport */}
-      <main className="flex-1 w-full min-h-screen pt-16 lg:pt-0 overflow-y-auto">
+      <main className="flex-1 w-full min-h-screen pt-16 lg:pt-0 pb-20 lg:pb-0 overflow-y-auto">
         <Outlet />
       </main>
+
+      {/* Mobile Bottom Quick Navigation Bar */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-white/95 dark:bg-[#070C18]/95 backdrop-blur-2xl border-t border-slate-200/90 dark:border-slate-800/90 z-40 flex items-center justify-around px-1 shadow-2xl">
+        {mobileBottomNavItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = item.end ? (location.pathname === item.path || location.pathname === '/admin/tables') : location.pathname.startsWith(item.path);
+          return (
+            <NavLink
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 h-full py-1 text-[10px] font-extrabold transition-all gap-1",
+                isActive
+                  ? "text-amber-500 dark:text-amber-400 font-black"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+              )}
+            >
+              <div className={cn(
+                "p-1.5 rounded-xl transition-all",
+                isActive && "bg-amber-400/20 text-amber-500 dark:text-amber-400"
+              )}>
+                <Icon className="w-5 h-5" />
+              </div>
+              <span className="truncate max-w-[64px] text-center leading-tight">{item.label}</span>
+            </NavLink>
+          );
+        })}
+        <button
+          type="button"
+          onClick={() => setMobileMenuOpen(true)}
+          className="flex flex-col items-center justify-center flex-1 h-full py-1 text-[10px] font-extrabold text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-all gap-1 cursor-pointer"
+        >
+          <div className="p-1.5 rounded-xl">
+            <Menu className="w-5 h-5" />
+          </div>
+          <span className="truncate max-w-[64px] text-center leading-tight">{t.admin.more}</span>
+        </button>
+      </div>
     </div>
   );
 }

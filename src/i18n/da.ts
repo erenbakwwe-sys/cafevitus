@@ -171,6 +171,10 @@ export const da = {
     staffPosPanel: 'Personale- & POS-panel',
     lightToggle: 'Lyst',
     darkToggle: 'Mørkt',
+    backToMenu: 'Tilbage til Menu',
+    customerView: 'Gæstemenu',
+    adminPanel: 'Admin Panel',
+    more: 'Mere',
     navigation: {
       tables: 'Borde & POS',
       kitchen: 'Køkkendisplay (KDS)',

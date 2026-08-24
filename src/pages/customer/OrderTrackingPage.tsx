@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Clock, ChefHat, Package, ArrowLeft, Utensils, Star, Sparkles, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, Package, ArrowLeft, Utensils, Star, Sparkles, AlertCircle, ShieldCheck, Coffee } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
@@ -218,6 +218,32 @@ export function OrderTrackingPage() {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-[#060D1E]/80 backdrop-blur-md py-10 text-center text-xs text-slate-500 mt-10">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="inline-flex items-center gap-2 mb-2">
+            <div className="w-8 h-8 rounded-xl bg-amber-400 text-slate-950 flex items-center justify-center font-black">
+              <Coffee className="w-4 h-4" />
+            </div>
+            <p className="font-extrabold text-slate-900 dark:text-white text-base font-serif-luxury">
+              Cafe Vitus • {t.productCard.harborLocation}
+            </p>
+          </div>
+          <p className="text-xs text-slate-400 mt-1 font-medium">{t.common.slogan}</p>
+          <p className="text-[11px] text-slate-400 mt-4">© {new Date().getFullYear()} Cafe Vitus. {t.productCard.allRightsReserved}</p>
+
+          <div className="mt-5 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center">
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-600 dark:text-slate-400 text-xs font-bold transition-all shadow-2xs"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>{t.admin.title}</span>
+            </Link>
+          </div>
+        </div>
+      </footer>
 
       <CartDrawer
         isOpen={isCartOpen}

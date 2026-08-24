@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, AlertCircle, ArrowRight, MapPin, Coffee, Utensils, Check, Sparkles } from 'lucide-react';
+import { Search, AlertCircle, ArrowRight, MapPin, Coffee, Utensils, Check, Sparkles, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useCart } from '../../contexts/CartContext';
@@ -317,6 +317,16 @@ export function MenuPage() {
           </div>
           <p className="text-xs text-slate-400 mt-1 font-medium">{t.common.slogan}</p>
           <p className="text-[11px] text-slate-400 mt-4">© {new Date().getFullYear()} Cafe Vitus. {t.productCard.allRightsReserved}</p>
+
+          <div className="mt-5 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center">
+            <Link
+              to="/admin"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-600 dark:text-slate-400 text-xs font-bold transition-all shadow-2xs"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>{t.admin.title}</span>
+            </Link>
+          </div>
         </div>
       </footer>
 

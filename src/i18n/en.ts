@@ -171,6 +171,10 @@ export const en = {
     staffPosPanel: 'Staff & POS Panel',
     lightToggle: 'Light',
     darkToggle: 'Dark',
+    backToMenu: 'Back to Menu',
+    customerView: 'Guest Menu',
+    adminPanel: 'Admin Panel',
+    more: 'More',
     navigation: {
       tables: 'Tables & POS',
       kitchen: 'Kitchen (KDS)',
