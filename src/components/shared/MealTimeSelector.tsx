@@ -63,7 +63,7 @@ export function MealTimeSelector({
   }[] = [
     {
       id: 'auto',
-      label: `${t.mealPeriods.auto} (${currentAutoPeriod === 'breakfast' ? t.mealPeriods.breakfast : currentAutoPeriod === 'lunch' ? t.mealPeriods.lunch : t.mealPeriods.dinner})`,
+      label: t.mealPeriods.auto,
       hours: currentAutoPeriod === 'breakfast' ? t.mealPeriods.breakfastHours : currentAutoPeriod === 'lunch' ? t.mealPeriods.lunchHours : t.mealPeriods.dinnerHours,
       icon: <Clock className="w-4 h-4 text-emerald-500" />,
       color: 'bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',

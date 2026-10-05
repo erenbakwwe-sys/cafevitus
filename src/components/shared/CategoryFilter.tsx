@@ -37,7 +37,7 @@ export const CategoryFilter: React.FC<CategoryFilterProps> = ({ categories, acti
   }, [activeCategory]);
 
   return (
-    <div className="sticky top-15 sm:top-20 z-30 w-full bg-white/85 dark:bg-[#070C18]/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 py-3 shadow-xs">
+    <div className="sticky top-16 sm:top-[112px] z-30 w-full bg-white/95 dark:bg-[#070C18]/95 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 py-2 sm:py-3 shadow-xs">
       <div 
         ref={scrollRef}
         className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 flex items-center gap-2 sm:gap-2.5 overflow-x-auto no-scrollbar"
