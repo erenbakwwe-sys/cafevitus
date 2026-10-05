@@ -20,8 +20,12 @@ export function getCurrentMealPeriod(): MealPeriod {
   if (timeVal >= 11.5 && timeVal < 16.5) {
     return 'lunch';
   }
-  // 16:30 – 23:00 / Night = Dinner
-  return 'dinner';
+  // 16:30 – 22:30 = Dinner
+  if (timeVal >= 16.5 && timeVal < 22.5) {
+    return 'dinner';
+  }
+  // 22:30 – 07:00 = Full menu so late-night guests can explore everything
+  return 'all-day';
 }
 
 interface MealTimeSelectorProps {

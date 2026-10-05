@@ -69,18 +69,55 @@ function generateId(): string {
 
 // Unified Storage API
 export const storage = {
-  // Get all documents from a collection
+  // Synchronous read directly from local cache (0ms)
+  getLocal<T>(collectionName: string): T[] {
+    return getLocalCollection(collectionName) as T[];
+  },
+
+  // Get all documents from a collection with local-cache priority
   async getAll<T>(collectionName: string, constraints?: QueryConstraint[]): Promise<T[]> {
+    const localItems = getLocalCollection(collectionName) as T[];
+
+    // If local cache already has items, return immediately for instant UI load
+    if (localItems.length > 0) {
+      if (isFirebaseConfigured && db) {
+        // Background sync with Firebase without delaying the UI (max 2s timeout)
+        (async () => {
+          try {
+            const q = constraints
+              ? query(collection(db, collectionName), ...constraints)
+              : query(collection(db, collectionName));
+            const timeoutPromise = new Promise<never>((_, reject) => 
+              setTimeout(() => reject(new Error('timeout')), 2000)
+            );
+            const snapshot = await Promise.race([getDocs(q), timeoutPromise]) as any;
+            if (snapshot?.docs?.length > 0) {
+              const remote = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() }));
+              setLocalCollection(collectionName, remote);
+            }
+          } catch {}
+        })();
+      }
+      return localItems;
+    }
+
+    // If local is empty, attempt fast Firebase fetch with 2s timeout
     if (isFirebaseConfigured && db) {
       try {
         const q = constraints
           ? query(collection(db, collectionName), ...constraints)
           : query(collection(db, collectionName));
-        const snapshot = await getDocs(q);
-        return snapshot.docs.map((d) => ({ id: d.id, ...d.data() } as T));
+        const timeoutPromise = new Promise<never>((_, reject) => 
+          setTimeout(() => reject(new Error('timeout')), 2000)
+        );
+        const snapshot = await Promise.race([getDocs(q), timeoutPromise]) as any;
+        if (snapshot?.docs?.length > 0) {
+          const remote = snapshot.docs.map((d: any) => ({ id: d.id, ...d.data() } as T));
+          setLocalCollection(collectionName, remote);
+          return remote;
+        }
       } catch (error) {
-        console.warn(`Firebase getAll failed for ${collectionName}, using localStorage:`, error);
-        return getLocalCollection(collectionName) as T[];
+        console.warn(`Firebase getAll timed out/failed for ${collectionName}, using localStorage:`, error);
       }
     }
     return getLocalCollection(collectionName) as T[];
@@ -236,6 +273,27 @@ export const storage = {
     }
   },
 
+  // High-performance bulk set for fast seeding and instant UI updates
+  async setAll<T extends { id: string }>(collectionName: string, items: T[]): Promise<void> {
+    setLocalCollection(collectionName, items);
+    broadcastChange(collectionName);
+    const lsnrs = localListeners.get(collectionName);
+    if (lsnrs) {
+      lsnrs.forEach((listener) => listener(items));
+    }
+
+    if (isFirebaseConfigured && db) {
+      // Async background push without delaying UI
+      (async () => {
+        try {
+          for (const item of items) {
+            setDoc(doc(db, collectionName, item.id), { ...item, updatedAt: Date.now() }).catch(() => {});
+          }
+        } catch {}
+      })();
+    }
+  },
+
   // Real-time subscription
   subscribe<T>(collectionName: string, callback: (data: T[]) => void, constraints?: QueryConstraint[]): () => void {
     if (isFirebaseConfigured && db) {
@@ -278,8 +336,10 @@ export const storage = {
     };
   },
 
-  // Check if database has been seeded
+  // Check if database has been seeded (instant local verification)
   async isSeeded(): Promise<boolean> {
+    const local = getLocalCollection('menu');
+    if (local && local.length > 0) return true;
     const items = await this.getAll('menu');
     return items.length > 0;
   },

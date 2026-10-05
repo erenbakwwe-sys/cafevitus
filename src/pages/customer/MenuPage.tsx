@@ -74,21 +74,38 @@ export function MenuPage() {
 
   useEffect(() => {
     const init = async () => {
-      setLoading(true);
+      // 1. Instant cache load (0ms): If local cache already has items, render immediately!
+      const cachedCats = storage.getLocal<Category>('categories');
+      const cachedItems = storage.getLocal<MenuItem>('menu');
+      if (cachedItems && cachedItems.length > 0) {
+        setCategories(cachedCats.sort((a, b) => a.sortOrder - b.sortOrder));
+        setMenuItems(cachedItems);
+        setLoading(false);
+      } else {
+        setLoading(true);
+      }
+
+      // 2. Ensure database is seeded with full Danish menu
       await seedDatabase(storage, false);
+
+      // 3. Sync latest data
       const [cats, items] = await Promise.all([
         storage.getAll<Category>('categories'),
         storage.getAll<MenuItem>('menu'),
       ]);
-      setCategories(cats.sort((a, b) => a.sortOrder - b.sortOrder));
-      setMenuItems(items);
+      if (items.length > 0) {
+        setCategories(cats.sort((a, b) => a.sortOrder - b.sortOrder));
+        setMenuItems(items);
+      }
       setLoading(false);
     };
 
     init();
 
     const unsubMenu = storage.subscribe<MenuItem>('menu', (updated) => {
-      setMenuItems(updated);
+      if (updated && updated.length > 0) {
+        setMenuItems(updated);
+      }
     });
 
     return () => unsubMenu();
@@ -125,9 +142,11 @@ export function MenuPage() {
       item.description.en?.toLowerCase().includes(query);
     const matchesTag = !activeTag || item.tags?.includes(activeTag as any);
 
-    // Dynamic Time-Based Meal Period Filtering
+    // Dynamic Time-Based Meal Period Filtering:
+    // If the customer hasn't selected a specific category tab, filter by the current meal period.
+    // If the customer explicitly chooses a category tab (e.g. 'Morgenmad'), respect their choice!
     let matchesMealPeriod = true;
-    if (effectivePeriod !== 'all-day') {
+    if (!activeCategory && effectivePeriod !== 'all-day') {
       if (item.mealPeriods && item.mealPeriods.length > 0) {
         matchesMealPeriod = item.mealPeriods.includes(effectivePeriod as any) || item.mealPeriods.includes('all-day');
       } else {

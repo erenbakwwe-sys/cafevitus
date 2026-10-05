@@ -878,63 +878,92 @@ export async function seedDatabase(storageApi: any, force = false): Promise<void
   try {
     const isAlreadySeeded = await storageApi.isSeeded();
     if (!isAlreadySeeded || force) {
-      for (const cat of seedCategories) {
-        await storageApi.set('categories', cat.id, cat);
-      }
-      for (const item of seedMenuItems) {
-        await storageApi.set('menu', item.id, item);
-      }
-      for (const table of seedTables) {
-        await storageApi.set('tables', table.id, table);
-      }
-      for (const coupon of seedCoupons) {
-        await storageApi.set('coupons', coupon.id, coupon);
-      }
-      for (const stock of seedStock) {
-        await storageApi.set('stock', stock.id, stock);
+      if (storageApi.setAll) {
+        await Promise.all([
+          storageApi.setAll('categories', seedCategories),
+          storageApi.setAll('menu', seedMenuItems),
+          storageApi.setAll('tables', seedTables),
+          storageApi.setAll('coupons', seedCoupons),
+          storageApi.setAll('stock', seedStock),
+        ]);
+      } else {
+        for (const cat of seedCategories) {
+          await storageApi.set('categories', cat.id, cat);
+        }
+        for (const item of seedMenuItems) {
+          await storageApi.set('menu', item.id, item);
+        }
+        for (const table of seedTables) {
+          await storageApi.set('tables', table.id, table);
+        }
+        for (const coupon of seedCoupons) {
+          await storageApi.set('coupons', coupon.id, coupon);
+        }
+        for (const stock of seedStock) {
+          await storageApi.set('stock', stock.id, stock);
+        }
       }
     }
 
     // Always ensure new modules are seeded if empty
-    const existingReservations = await storageApi.getAll('reservations');
-    if (existingReservations.length === 0 || force) {
-      for (const res of seedReservations) {
-        await storageApi.set('reservations', res.id, res);
+    const checkCollection = (name: string) => {
+      if (storageApi.getLocal) {
+        const local = storageApi.getLocal(name);
+        return local && local.length > 0;
       }
-    }
+      return false;
+    };
 
-    const existingStaff = await storageApi.getAll('staff');
-    if (existingStaff.length === 0 || force) {
-      for (const member of seedStaff) {
-        await storageApi.set('staff', member.id, member);
+    if (storageApi.setAll) {
+      const tasks: Promise<any>[] = [];
+      if (!checkCollection('reservations') || force) tasks.push(storageApi.setAll('reservations', seedReservations));
+      if (!checkCollection('staff') || force) tasks.push(storageApi.setAll('staff', seedStaff));
+      if (!checkCollection('shifts') || force) tasks.push(storageApi.setAll('shifts', seedShifts));
+      if (!checkCollection('attendance') || force) tasks.push(storageApi.setAll('attendance', seedAttendanceLogs));
+      if (!checkCollection('temperatures') || force) tasks.push(storageApi.setAll('temperatures', seedTemperatures));
+      if (!checkCollection('hygiene_checklists') || force) tasks.push(storageApi.setAll('hygiene_checklists', seedHygieneChecklists));
+      if (tasks.length > 0) await Promise.all(tasks);
+    } else {
+      const existingReservations = await storageApi.getAll('reservations');
+      if (existingReservations.length === 0 || force) {
+        for (const res of seedReservations) {
+          await storageApi.set('reservations', res.id, res);
+        }
       }
-    }
 
-    const existingShifts = await storageApi.getAll('shifts');
-    if (existingShifts.length === 0 || force) {
-      for (const shift of seedShifts) {
-        await storageApi.set('shifts', shift.id, shift);
+      const existingStaff = await storageApi.getAll('staff');
+      if (existingStaff.length === 0 || force) {
+        for (const member of seedStaff) {
+          await storageApi.set('staff', member.id, member);
+        }
       }
-    }
 
-    const existingAttendance = await storageApi.getAll('attendance');
-    if (existingAttendance.length === 0 || force) {
-      for (const att of seedAttendanceLogs) {
-        await storageApi.set('attendance', att.id, att);
+      const existingShifts = await storageApi.getAll('shifts');
+      if (existingShifts.length === 0 || force) {
+        for (const shift of seedShifts) {
+          await storageApi.set('shifts', shift.id, shift);
+        }
       }
-    }
 
-    const existingTemperatures = await storageApi.getAll('temperatures');
-    if (existingTemperatures.length === 0 || force) {
-      for (const temp of seedTemperatures) {
-        await storageApi.set('temperatures', temp.id, temp);
+      const existingAttendance = await storageApi.getAll('attendance');
+      if (existingAttendance.length === 0 || force) {
+        for (const att of seedAttendanceLogs) {
+          await storageApi.set('attendance', att.id, att);
+        }
       }
-    }
 
-    const existingHygiene = await storageApi.getAll('hygiene_checklists');
-    if (existingHygiene.length === 0 || force) {
-      for (const chk of seedHygieneChecklists) {
-        await storageApi.set('hygiene_checklists', chk.id, chk);
+      const existingTemperatures = await storageApi.getAll('temperatures');
+      if (existingTemperatures.length === 0 || force) {
+        for (const temp of seedTemperatures) {
+          await storageApi.set('temperatures', temp.id, temp);
+        }
+      }
+
+      const existingHygiene = await storageApi.getAll('hygiene_checklists');
+      if (existingHygiene.length === 0 || force) {
+        for (const chk of seedHygieneChecklists) {
+          await storageApi.set('hygiene_checklists', chk.id, chk);
+        }
       }
     }
 
