@@ -19,7 +19,7 @@ export interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onReserveClick, tableNumber }) => {
-  const { language, toggleLanguage, t } = useLanguage();
+  const { language, setLanguage, t } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
   const { itemCount } = useCart();
   const navigate = useNavigate();
@@ -137,16 +137,37 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onRe
                 <span className="hidden xs:inline">Admin</span>
               </motion.button>
 
-              {/* Language Switch */}
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                type="button"
-                onClick={toggleLanguage}
-                className="min-h-[40px] px-2.5 sm:px-3.5 py-1.5 rounded-2xl text-[11px] sm:text-xs font-black bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors cursor-pointer flex items-center justify-center shadow-2xs"
-              >
-                {language === 'en' ? '🇩🇰 DA' : '🇬🇧 EN'}
-              </motion.button>
+              {/* Segmented Dual-Pill Language Selector */}
+              <div className="min-h-[40px] p-1 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center shadow-2xs shrink-0">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('da')}
+                  className={cn(
+                    "px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-1",
+                    language === 'da'
+                      ? "bg-amber-400 text-slate-950 shadow-xs"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  )}
+                  title="Dansk"
+                >
+                  <span>🇩🇰</span>
+                  <span className="tracking-wide">DA</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={cn(
+                    "px-2 sm:px-2.5 py-1 rounded-xl text-[11px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-1",
+                    language === 'en'
+                      ? "bg-amber-400 text-slate-950 shadow-xs"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  )}
+                  title="English"
+                >
+                  <span>🇬🇧</span>
+                  <span className="tracking-wide">EN</span>
+                </button>
+              </div>
 
               {/* Dark / Light Toggle */}
               <motion.button

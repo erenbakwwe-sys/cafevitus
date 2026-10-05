@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [error, setError] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { login } = useAuth();
-  const { language, t, toggleLanguage } = useLanguage();
+  const { language, t, setLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -94,14 +94,34 @@ export default function LoginPage() {
           >
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-amber-500" />}
           </button>
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-800 font-bold text-xs shadow-2xs uppercase cursor-pointer flex items-center gap-1.5"
-          >
-            <Globe className="w-3.5 h-3.5 text-amber-500" />
-            <span>{language}</span>
-          </button>
+          <div className="p-1 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setLanguage('da')}
+              className={cn(
+                "px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1",
+                language === 'da'
+                  ? "bg-amber-400 text-slate-950 shadow-xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900"
+              )}
+            >
+              <span>🇩🇰</span>
+              <span>DA</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={cn(
+                "px-2.5 py-1 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1",
+                language === 'en'
+                  ? "bg-amber-400 text-slate-950 shadow-xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900"
+              )}
+            >
+              <span>🇬🇧</span>
+              <span>EN</span>
+            </button>
+          </div>
         </div>
       </div>
 

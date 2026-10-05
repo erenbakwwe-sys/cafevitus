@@ -15,7 +15,7 @@ import { cn } from '../../lib/utils';
 
 export default function AdminLayout() {
   const { isAuthenticated, logout } = useAuth();
-  const { language, t, toggleLanguage } = useLanguage();
+  const { language, t, setLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -118,14 +118,34 @@ export default function AdminLayout() {
             {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-amber-500" />}
             <span>{isDark ? t.admin.lightToggle : t.admin.darkToggle}</span>
           </button>
-          <button
-            type="button"
-            onClick={toggleLanguage}
-            className="flex-1 flex items-center justify-center gap-2 p-2.5 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors border border-slate-200/80 dark:border-slate-700 font-bold text-xs shadow-2xs uppercase cursor-pointer"
-          >
-            <Globe className="w-4 h-4 text-amber-500" />
-            <span>{language}</span>
-          </button>
+          <div className="flex-1 p-1 rounded-xl bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center shadow-2xs">
+            <button
+              type="button"
+              onClick={() => setLanguage('da')}
+              className={cn(
+                "flex-1 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1",
+                language === 'da'
+                  ? "bg-amber-400 text-slate-950 shadow-xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900"
+              )}
+            >
+              <span>🇩🇰</span>
+              <span>DA</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={cn(
+                "flex-1 py-1 rounded-lg text-xs font-black transition-all cursor-pointer flex items-center justify-center gap-1",
+                language === 'en'
+                  ? "bg-amber-400 text-slate-950 shadow-xs"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-900"
+              )}
+            >
+              <span>🇬🇧</span>
+              <span>EN</span>
+            </button>
+          </div>
         </div>
         
         <button
