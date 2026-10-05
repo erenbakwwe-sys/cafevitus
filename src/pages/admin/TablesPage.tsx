@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Users, Bell, Check, Clock, Plus, Trash2, Printer, 
-  CreditCard, Banknote, AlertCircle, RefreshCw, X, ShieldCheck, Sparkles, Coffee
+  CreditCard, Banknote, AlertCircle, RefreshCw, X, ShieldCheck
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { storage } from '../../lib/storage';
-import { Table, Order, WaiterCall, TableStatus, MenuItem } from '../../types';
+import { Table, Order, WaiterCall, TableStatus } from '../../types';
 import { formatCurrency, formatTime, getTableStatusColor, cn } from '../../lib/utils';
 import { toast } from 'sonner';
 
@@ -16,20 +16,17 @@ export default function TablesPage() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [waiterCalls, setWaiterCalls] = useState<WaiterCall[]>([]);
   const [selectedTable, setSelectedTable] = useState<Table | null>(null);
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
-      const [tData, oData, wData, mData] = await Promise.all([
+      const [tData, oData, wData] = await Promise.all([
         storage.getAll<Table>('tables'),
         storage.getAll<Order>('orders'),
         storage.getAll<WaiterCall>('waiter_calls'),
-        storage.getAll<MenuItem>('menu'),
       ]);
       setTables(tData.sort((a, b) => parseInt(a.number) - parseInt(b.number)));
       setOrders(oData);
       setWaiterCalls(wData);
-      setMenuItems(mData);
     };
 
     loadData();

@@ -35,10 +35,6 @@ export default function ExpensesPage() {
     { id: 'other', label: t.admin.expenses.categories.other },
   ];
 
-  useEffect(() => {
-    loadData();
-  }, []);
-
   const loadData = async () => {
     const [rawExpenses, allOrders] = await Promise.all([
       storage.getAll<Expense>('expenses'),
@@ -47,6 +43,10 @@ export default function ExpensesPage() {
     setExpenses(rawExpenses);
     setOrders(allOrders.filter((o) => o.status === 'completed' || o.status === 'delivered' || o.status === 'paid'));
   };
+
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const getFilteredData = () => {
     const now = new Date();

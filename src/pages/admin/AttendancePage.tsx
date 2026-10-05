@@ -1,21 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Clock,
   KeyRound,
-  CheckCircle2,
   LogOut,
   LogIn,
-  Coffee,
   Users,
-  DollarSign,
-  Calendar,
-  AlertCircle,
-  ShieldCheck,
-  Sparkles,
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
-import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
 import { AttendanceLog, StaffMember, StaffRole } from '../../types';
 import { formatCurrency, formatTime, formatDate, cn } from '../../lib/utils';
@@ -23,22 +13,12 @@ import { toast } from 'sonner';
 
 export default function AttendancePage() {
   const { t, language } = useLanguage();
-  const { isDark } = useTheme();
 
   const [staffList, setStaffList] = useState<StaffMember[]>([]);
   const [logs, setLogs] = useState<AttendanceLog[]>([]);
   const [enteredPin, setEnteredPin] = useState('');
   const [selectedStaffId, setSelectedStaffId] = useState<string>('');
-
-  useEffect(() => {
-    loadData();
-    const unsubStaff = storage.subscribe<StaffMember>('staff', (data) => setStaffList(data));
-    const unsubLogs = storage.subscribe<AttendanceLog>('attendance', (data) => setLogs(data));
-    return () => {
-      unsubStaff();
-      unsubLogs();
-    };
-  }, []);
+  const [currentTime, setCurrentTime] = useState(Date.now());
 
   const loadData = async () => {
     const [staffData, logData] = await Promise.all([
@@ -48,6 +28,19 @@ export default function AttendancePage() {
     setStaffList(staffData);
     setLogs(logData.sort((a, b) => b.checkInTime - a.checkInTime));
   };
+
+  useEffect(() => {
+    loadData();
+    const unsubStaff = storage.subscribe<StaffMember>('staff', (data) => setStaffList(data));
+    const unsubLogs = storage.subscribe<AttendanceLog>('attendance', (data) => setLogs(data));
+    const timer = setInterval(() => setCurrentTime(Date.now()), 30000);
+
+    return () => {
+      unsubStaff();
+      unsubLogs();
+      clearInterval(timer);
+    };
+  }, []);
 
   const handleKeypadPress = (digit: string) => {
     if (enteredPin.length < 4) {
@@ -143,7 +136,7 @@ export default function AttendancePage() {
   const activeStaffLogs = logs.filter((l) => l.status === 'active');
 
   const getDurationText = (checkInTime: number) => {
-    const diffMin = Math.floor((Date.now() - checkInTime) / 60000);
+    const diffMin = Math.floor((currentTime - checkInTime) / 60000);
     const h = Math.floor(diffMin / 60);
     const m = diffMin % 60;
     return `${h}t ${m}m`;
@@ -152,7 +145,7 @@ export default function AttendancePage() {
   const getRunningWage = (checkInTime: number, staffId: string) => {
     const staff = staffList.find((s) => s.id === staffId);
     if (!staff) return 0;
-    const diffHours = (Date.now() - checkInTime) / 3600000;
+    const diffHours = (currentTime - checkInTime) / 3600000;
     return Math.round(diffHours * staff.hourlyWage);
   };
 
