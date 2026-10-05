@@ -1,4 +1,16 @@
-import { Category, MenuItem, Table, Coupon, StockItem } from '../types';
+import {
+  Category,
+  MenuItem,
+  Table,
+  Coupon,
+  StockItem,
+  TableReservation,
+  StaffMember,
+  Shift,
+  AttendanceLog,
+  TemperatureLog,
+  HygieneChecklist,
+} from '../types';
 
 export const seedCategories: Category[] = [
   {
@@ -60,6 +72,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 125,
     image: '/images/smorrebrod-laks.jpg',
     tags: ['chef-pick'],
+    mealPeriods: ['lunch', 'dinner'],
     available: true,
     customizations: [
       {
@@ -101,6 +114,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 145,
     image: '/images/stegt-fisk.jpg',
     tags: ['chef-pick'],
+    mealPeriods: ['lunch', 'dinner'],
     available: true,
     customizations: [
       {
@@ -131,6 +145,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 135,
     image: '/images/rejesalat.png',
     tags: ['chef-pick', 'gluten-free'],
+    mealPeriods: ['lunch', 'dinner'],
     available: true,
     customizations: [],
     createdAt: Date.now(),
@@ -150,6 +165,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 115,
     image: '/images/salat.png',
     tags: ['vegetarian'],
+    mealPeriods: ['lunch', 'dinner'],
     available: true,
     customizations: [
       {
@@ -180,6 +196,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 85,
     image: '/images/aperol-spritz.png',
     tags: ['chef-pick', 'vegan'],
+    mealPeriods: ['lunch', 'dinner', 'all-day'],
     available: true,
     customizations: [
       {
@@ -210,6 +227,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 45,
     image: 'https://images.unsplash.com/photo-1572442388796-11668a67e53d?auto=format&fit=crop&w=800&q=80',
     tags: ['vegetarian'],
+    mealPeriods: ['breakfast', 'lunch', 'dinner', 'all-day'],
     available: true,
     customizations: [
       {
@@ -262,6 +280,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 48,
     image: 'https://images.unsplash.com/photo-1561047029-3000c68339ca?auto=format&fit=crop&w=800&q=80',
     tags: ['vegetarian'],
+    mealPeriods: ['breakfast', 'lunch', 'dinner', 'all-day'],
     available: true,
     customizations: [
       {
@@ -292,6 +311,7 @@ export const seedMenuItems: MenuItem[] = [
     price: 68,
     image: 'https://images.unsplash.com/photo-1562376552-0d160a2f238d?auto=format&fit=crop&w=800&q=80',
     tags: ['vegetarian'],
+    mealPeriods: ['lunch', 'dinner', 'all-day'],
     available: true,
     customizations: [],
     createdAt: Date.now(),
@@ -311,6 +331,119 @@ export const seedMenuItems: MenuItem[] = [
     price: 110,
     image: 'https://images.unsplash.com/photo-1525351484163-7529414344d8?auto=format&fit=crop&w=800&q=80',
     tags: ['chef-pick', 'vegetarian'],
+    mealPeriods: ['breakfast'],
+    available: true,
+    customizations: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'brk-croissant',
+    categoryId: 'breakfast',
+    name: {
+      en: 'Freshly Baked Butter Croissant',
+      da: 'Smørbagt Fransk Croissant',
+    },
+    description: {
+      en: 'Flaky warm all-butter croissant served with organic strawberry marmalade and whipped salted butter.',
+      da: 'Sprød, smørmættet fransk croissant serveret med økologisk jordbærmarmelade og pisket saltet smør.',
+    },
+    price: 36,
+    image: 'https://images.unsplash.com/photo-1555507036-ab1f4038808a?auto=format&fit=crop&w=800&q=80',
+    tags: ['vegetarian'],
+    mealPeriods: ['breakfast'],
+    available: true,
+    customizations: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'brk-avocado',
+    categoryId: 'breakfast',
+    name: {
+      en: 'Smashed Avocado Surdejsmad',
+      da: 'Knust Avokado på Surdejsbrød',
+    },
+    description: {
+      en: 'Toasted artisan sourdough bread, crushed avocado, poached organic egg, chili flakes, microgreens and cold-pressed olive oil.',
+      da: 'Ristet surdejsbrød med knust avokado, økologisk pocheret æg, chiliflager, ærteskud og koldpresset jomfruolivenolie.',
+    },
+    price: 95,
+    image: 'https://images.unsplash.com/photo-1588137378633-dea1336ce1e2?auto=format&fit=crop&w=800&q=80',
+    tags: ['vegetarian', 'chef-pick'],
+    mealPeriods: ['breakfast'],
+    available: true,
+    customizations: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'brk-skyr',
+    categoryId: 'breakfast',
+    name: {
+      en: 'Organic Skyr Bowl with Granola & Berries',
+      da: 'Økologisk Skyr Bowl med Granola & Bær',
+    },
+    description: {
+      en: 'Creamy Nordic vanilla skyr topped with house-toasted maple granola, fresh blueberries, chia seeds and Snekkersten blossom honey.',
+      da: 'Cremet økologisk vaniljeskyr toppet med ristet ahorngranola, friske blåbær, chiafrø og lokal blomsterhonning.',
+    },
+    price: 78,
+    image: 'https://images.unsplash.com/photo-1590301157890-4810ed352733?auto=format&fit=crop&w=800&q=80',
+    tags: ['vegetarian', 'gluten-free'],
+    mealPeriods: ['breakfast'],
+    available: true,
+    customizations: [],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'din-steak',
+    categoryId: 'smorrebrod',
+    name: {
+      en: 'Danish Grass-Fed Ribeye Steak (250g)',
+      da: 'Dansk Krogmodnet Ribeye Steak (250g)',
+    },
+    description: {
+      en: 'Tender grilled Danish ribeye with house-whipped Bearnaise sauce, harbor sea salt fries and charred harbor broccolini.',
+      da: 'Mør grillet krogmodnet dansk ribeye serveret med håndpisket bearnaisesauce, havsaltede fritter og grillet asparges-broccoli.',
+    },
+    price: 245,
+    image: 'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=800&q=80',
+    tags: ['chef-pick', 'gluten-free'],
+    mealPeriods: ['dinner'],
+    available: true,
+    customizations: [
+      {
+        id: 'doneness',
+        name: { en: 'Steak Doneness', da: 'Stegegrad' },
+        type: 'single',
+        required: true,
+        options: [
+          { id: 'medium-rare', name: { en: 'Medium Rare (Pink & Juicy)', da: 'Medium Rare (Rosa)' }, price: 0 },
+          { id: 'medium', name: { en: 'Medium', da: 'Medium' }, price: 0 },
+          { id: 'well-done', name: { en: 'Well Done', da: 'Gennemstegt' }, price: 0 },
+        ],
+      },
+    ],
+    createdAt: Date.now(),
+    updatedAt: Date.now(),
+  },
+  {
+    id: 'din-bouillabaisse',
+    categoryId: 'smorrebrod',
+    name: {
+      en: 'Snekkersten Harbor Seafood Bouillabaisse',
+      da: 'Snekkersten Havn Bouillabaisse',
+    },
+    description: {
+      en: 'Rich seafood soup with saffron, local cod, Greenland prawns, blue mussels, fennel and toasted sourdough with garlic rouille.',
+      da: 'Rig fiskesuppe med safran, lokal torsk, grønlandske rejer, blåmuslinger, fennikel og ristet surdejsbrød med hvidløgsrouille.',
+    },
+    price: 185,
+    image: 'https://images.unsplash.com/photo-1594041680534-e8c8cdebd659?auto=format&fit=crop&w=800&q=80',
+    tags: ['chef-pick'],
+    mealPeriods: ['lunch', 'dinner'],
     available: true,
     customizations: [],
     createdAt: Date.now(),
@@ -418,28 +551,396 @@ export const seedStock: StockItem[] = [
   },
 ];
 
+export const seedReservations: TableReservation[] = [
+  {
+    id: 'res-1',
+    reservationCode: 'CV-8491',
+    guestName: 'Anders Møller',
+    guestPhone: '+45 28 44 19 82',
+    guestEmail: 'anders.moller@gmail.com',
+    date: new Date().toISOString().split('T')[0],
+    time: '18:30',
+    guestsCount: 4,
+    tablePreference: 'outdoor-harbor',
+    assignedTableNumber: '5',
+    specialRequests: 'Fødselsdagsmiddag, gerne tæt på kajen.',
+    depositPerPerson: 50,
+    totalDeposit: 200,
+    depositPaid: true,
+    status: 'confirmed',
+    createdAt: Date.now() - 2 * 3600 * 1000,
+    updatedAt: Date.now() - 2 * 3600 * 1000,
+  },
+  {
+    id: 'res-2',
+    reservationCode: 'CV-7320',
+    guestName: 'Sofie & Morten Nielsen',
+    guestPhone: '+45 40 19 22 71',
+    guestEmail: 'sofie.n@hotmail.com',
+    date: new Date().toISOString().split('T')[0],
+    time: '12:30',
+    guestsCount: 2,
+    tablePreference: 'indoor',
+    assignedTableNumber: '3',
+    specialRequests: 'Barnestol ønskes.',
+    depositPerPerson: 50,
+    totalDeposit: 100,
+    depositPaid: true,
+    status: 'seated',
+    createdAt: Date.now() - 4 * 3600 * 1000,
+    updatedAt: Date.now() - 1 * 3600 * 1000,
+  },
+  {
+    id: 'res-3',
+    reservationCode: 'CV-9012',
+    guestName: 'Christian Lind',
+    guestPhone: '+45 31 88 45 10',
+    guestEmail: 'clind@erhverv.dk',
+    date: new Date(Date.now() - 86400000).toISOString().split('T')[0],
+    time: '19:00',
+    guestsCount: 6,
+    tablePreference: 'outdoor-harbor',
+    specialRequests: 'Forretningsmiddag.',
+    depositPerPerson: 50,
+    totalDeposit: 300,
+    depositPaid: true,
+    status: 'no-show',
+    createdAt: Date.now() - 30 * 3600 * 1000,
+    updatedAt: Date.now() - 24 * 3600 * 1000,
+  },
+  {
+    id: 'res-4',
+    reservationCode: 'CV-3184',
+    guestName: 'Maria Højberg',
+    guestPhone: '+45 52 70 88 12',
+    guestEmail: 'maria.hojberg@outlook.dk',
+    date: new Date(Date.now() + 86400000).toISOString().split('T')[0],
+    time: '19:30',
+    guestsCount: 3,
+    tablePreference: 'any',
+    specialRequests: '1 person er glutenintolerant.',
+    depositPerPerson: 50,
+    totalDeposit: 150,
+    depositPaid: true,
+    status: 'confirmed',
+    createdAt: Date.now() - 10 * 3600 * 1000,
+    updatedAt: Date.now() - 10 * 3600 * 1000,
+  },
+];
+
+export const seedStaff: StaffMember[] = [
+  {
+    id: 'stf-lukas',
+    name: 'Lukas Berg',
+    role: 'manager',
+    pin: '1111',
+    phone: '+45 20 12 34 56',
+    email: 'lukas@cafevitus.dk',
+    hourlyWage: 215,
+    active: true,
+    workingDays: ['mon', 'tue', 'wed', 'thu', 'fri'],
+    color: '#3B82F6',
+    createdAt: Date.now() - 90 * 86400000,
+  },
+  {
+    id: 'stf-freja',
+    name: 'Freja Jensen',
+    role: 'chef',
+    pin: '2222',
+    phone: '+45 21 34 56 78',
+    email: 'freja@cafevitus.dk',
+    hourlyWage: 190,
+    active: true,
+    workingDays: ['tue', 'wed', 'thu', 'fri', 'sat'],
+    color: '#10B981',
+    createdAt: Date.now() - 60 * 86400000,
+  },
+  {
+    id: 'stf-emil',
+    name: 'Emil Thomsen',
+    role: 'waiter',
+    pin: '3333',
+    phone: '+45 22 45 67 89',
+    email: 'emil@cafevitus.dk',
+    hourlyWage: 165,
+    active: true,
+    workingDays: ['thu', 'fri', 'sat', 'sun'],
+    color: '#F59E0B',
+    createdAt: Date.now() - 45 * 86400000,
+  },
+  {
+    id: 'stf-astrid',
+    name: 'Astrid Lind',
+    role: 'bartender',
+    pin: '4444',
+    phone: '+45 23 56 78 90',
+    email: 'astrid@cafevitus.dk',
+    hourlyWage: 170,
+    active: true,
+    workingDays: ['wed', 'thu', 'fri', 'sat'],
+    color: '#8B5CF6',
+    createdAt: Date.now() - 30 * 86400000,
+  },
+  {
+    id: 'stf-magnus',
+    name: 'Magnus Holm',
+    role: 'dishwasher',
+    pin: '5555',
+    phone: '+45 24 67 89 01',
+    email: 'magnus@cafevitus.dk',
+    hourlyWage: 145,
+    active: true,
+    workingDays: ['fri', 'sat', 'sun'],
+    color: '#EC4899',
+    createdAt: Date.now() - 20 * 86400000,
+  },
+];
+
+export const seedShifts: Shift[] = [
+  {
+    id: 'sh-1',
+    staffId: 'stf-lukas',
+    staffName: 'Lukas Berg',
+    role: 'manager',
+    date: new Date().toISOString().split('T')[0],
+    startTime: '08:00',
+    endTime: '16:00',
+    breakMinutes: 30,
+    plannedHours: 7.5,
+    estimatedWage: 7.5 * 215,
+    status: 'scheduled',
+  },
+  {
+    id: 'sh-2',
+    staffId: 'stf-freja',
+    staffName: 'Freja Jensen',
+    role: 'chef',
+    date: new Date().toISOString().split('T')[0],
+    startTime: '10:00',
+    endTime: '18:00',
+    breakMinutes: 30,
+    plannedHours: 7.5,
+    estimatedWage: 7.5 * 190,
+    status: 'scheduled',
+  },
+  {
+    id: 'sh-3',
+    staffId: 'stf-emil',
+    staffName: 'Emil Thomsen',
+    role: 'waiter',
+    date: new Date().toISOString().split('T')[0],
+    startTime: '12:00',
+    endTime: '21:00',
+    breakMinutes: 45,
+    plannedHours: 8.25,
+    estimatedWage: 8.25 * 165,
+    status: 'scheduled',
+  },
+  {
+    id: 'sh-4',
+    staffId: 'stf-astrid',
+    staffName: 'Astrid Lind',
+    role: 'bartender',
+    date: new Date().toISOString().split('T')[0],
+    startTime: '16:00',
+    endTime: '23:30',
+    breakMinutes: 30,
+    plannedHours: 7.0,
+    estimatedWage: 7.0 * 170,
+    status: 'scheduled',
+  },
+];
+
+export const seedAttendanceLogs: AttendanceLog[] = [
+  {
+    id: 'att-1',
+    staffId: 'stf-lukas',
+    staffName: 'Lukas Berg',
+    role: 'manager',
+    checkInTime: Date.now() - 5.5 * 3600 * 1000,
+    breakMinutes: 30,
+    status: 'active',
+  },
+  {
+    id: 'att-2',
+    staffId: 'stf-freja',
+    staffName: 'Freja Jensen',
+    role: 'chef',
+    checkInTime: Date.now() - 3.5 * 3600 * 1000,
+    breakMinutes: 15,
+    status: 'active',
+  },
+  {
+    id: 'att-3',
+    staffId: 'stf-emil',
+    staffName: 'Emil Thomsen',
+    role: 'waiter',
+    checkInTime: Date.now() - 28 * 3600 * 1000,
+    checkOutTime: Date.now() - 20 * 3600 * 1000,
+    breakMinutes: 30,
+    totalHours: 7.5,
+    earnedWage: 7.5 * 165,
+    status: 'completed',
+    notes: 'Travl lørdag aften.',
+  },
+];
+
+export const seedTemperatures: TemperatureLog[] = [
+  {
+    id: 'temp-1',
+    unitName: 'Køleskab 1 (Fisk & Skaldyr)',
+    unitType: 'fridge',
+    temperature: 2.8,
+    maxAllowed: 4.0,
+    isCompliant: true,
+    checkedBy: 'Freja Jensen (Kok)',
+    timestamp: Date.now() - 2 * 3600 * 1000,
+  },
+  {
+    id: 'temp-2',
+    unitName: 'Køleskab 2 (Mejeri & Dressinger)',
+    unitType: 'fridge',
+    temperature: 3.6,
+    maxAllowed: 5.0,
+    isCompliant: true,
+    checkedBy: 'Freja Jensen (Kok)',
+    timestamp: Date.now() - 2 * 3600 * 1000,
+  },
+  {
+    id: 'temp-3',
+    unitName: 'Hovedfryser (Kød & Brød)',
+    unitType: 'freezer',
+    temperature: -21.2,
+    maxAllowed: -18.0,
+    isCompliant: true,
+    checkedBy: 'Freja Jensen (Kok)',
+    timestamp: Date.now() - 2 * 3600 * 1000,
+  },
+  {
+    id: 'temp-4',
+    unitName: 'Varmholdelse (Supper & Sovs)',
+    unitType: 'hot-holding',
+    temperature: 74.0,
+    maxAllowed: 65.0,
+    isCompliant: true,
+    checkedBy: 'Freja Jensen (Kok)',
+    timestamp: Date.now() - 1 * 3600 * 1000,
+  },
+];
+
+export const seedHygieneChecklists: HygieneChecklist[] = [
+  {
+    id: 'chk-opening',
+    type: 'opening',
+    title: { da: 'Daglig Åbningstjekliste (Enos Egenkontrol)', en: 'Daily Opening Checklist (Enos Hygiene)' },
+    date: new Date().toISOString().split('T')[0],
+    completed: true,
+    completedBy: 'Lukas Berg',
+    completedAt: Date.now() - 5 * 3600 * 1000,
+    items: [
+      { id: 'op-1', label: { da: 'Håndvaskestationer opfyldt med sæbe og engangspapir', en: 'Handwashing stations stocked with soap and paper towels' }, checked: true },
+      { id: 'op-2', label: { da: 'Arbejdsborde og skærebrætter desinficeret', en: 'Worktops and cutting boards sanitized' }, checked: true },
+      { id: 'op-3', label: { da: 'Køleskabe og frysere kontrolleret for temperatur', en: 'Refrigerators and freezers temperatures verified' }, checked: true },
+      { id: 'op-4', label: { da: 'Ingen spor af skadedyr eller urenheder', en: 'No signs of pests or contamination' }, checked: true },
+      { id: 'op-5', label: { da: 'Fødevarestyrelsens Smiley kontrolrapport ophængt synligt', en: 'Danish Food Inspection Smiley visibly displayed' }, checked: true },
+    ],
+  },
+  {
+    id: 'chk-closing',
+    type: 'closing',
+    title: { da: 'Daglig Lukketjekliste (Køkken & Bar)', en: 'Daily Closing Checklist (Kitchen & Bar)' },
+    date: new Date().toISOString().split('T')[0],
+    completed: false,
+    items: [
+      { id: 'cl-1', label: { da: 'Alt fersk kød og fisk dækket til, datomærket og sat på køl', en: 'All meat and fish covered, dated and chilled' }, checked: false },
+      { id: 'cl-2', label: { da: 'Opvaskemaskine tømt, renset og filter rengjort', en: 'Dishwasher drained, cleaned and filter washed' }, checked: false },
+      { id: 'cl-3', label: { da: 'Gulve fejet og vasket med godkendt desinfektionsmiddel', en: 'Floors swept and mopped with approved disinfectant' }, checked: false },
+      { id: 'cl-4', label: { da: 'Affaldsspande tømt og udendørs containere låst', en: 'Bins emptied and outdoor bins locked' }, checked: false },
+    ],
+  },
+  {
+    id: 'chk-delivery',
+    type: 'delivery',
+    title: { da: 'Varemodtagelse & Leverandørkontrol', en: 'Goods Receipt & Supplier Quality Control' },
+    date: new Date().toISOString().split('T')[0],
+    completed: true,
+    completedBy: 'Freja Jensen',
+    completedAt: Date.now() - 4 * 3600 * 1000,
+    items: [
+      { id: 'dl-1', label: { da: 'Kølevognens temperatur kontrolleret (≤ 4°C)', en: 'Delivery truck refrigerated temperature verified (≤ 4°C)' }, checked: true },
+      { id: 'dl-2', label: { da: 'Emballage ren, intakt og fri for fugt/brud', en: 'Packaging clean, intact and sealed' }, checked: true },
+      { id: 'dl-3', label: { da: 'Holdbarhedsdatoer tjekket og godkendt', en: 'Expiration dates inspected and approved' }, checked: true },
+    ],
+  },
+];
+
 export async function seedDatabase(storageApi: any, force = false): Promise<void> {
   try {
     const isAlreadySeeded = await storageApi.isSeeded();
-    if (isAlreadySeeded && !force) return;
+    if (!isAlreadySeeded || force) {
+      for (const cat of seedCategories) {
+        await storageApi.set('categories', cat.id, cat);
+      }
+      for (const item of seedMenuItems) {
+        await storageApi.set('menu', item.id, item);
+      }
+      for (const table of seedTables) {
+        await storageApi.set('tables', table.id, table);
+      }
+      for (const coupon of seedCoupons) {
+        await storageApi.set('coupons', coupon.id, coupon);
+      }
+      for (const stock of seedStock) {
+        await storageApi.set('stock', stock.id, stock);
+      }
+    }
 
-    for (const cat of seedCategories) {
-      await storageApi.set('categories', cat.id, cat);
+    // Always ensure new modules are seeded if empty
+    const existingReservations = await storageApi.getAll('reservations');
+    if (existingReservations.length === 0 || force) {
+      for (const res of seedReservations) {
+        await storageApi.set('reservations', res.id, res);
+      }
     }
-    for (const item of seedMenuItems) {
-      await storageApi.set('menu', item.id, item);
+
+    const existingStaff = await storageApi.getAll('staff');
+    if (existingStaff.length === 0 || force) {
+      for (const member of seedStaff) {
+        await storageApi.set('staff', member.id, member);
+      }
     }
-    for (const table of seedTables) {
-      await storageApi.set('tables', table.id, table);
+
+    const existingShifts = await storageApi.getAll('shifts');
+    if (existingShifts.length === 0 || force) {
+      for (const shift of seedShifts) {
+        await storageApi.set('shifts', shift.id, shift);
+      }
     }
-    for (const coupon of seedCoupons) {
-      await storageApi.set('coupons', coupon.id, coupon);
+
+    const existingAttendance = await storageApi.getAll('attendance');
+    if (existingAttendance.length === 0 || force) {
+      for (const att of seedAttendanceLogs) {
+        await storageApi.set('attendance', att.id, att);
+      }
     }
-    for (const stock of seedStock) {
-      await storageApi.set('stock', stock.id, stock);
+
+    const existingTemperatures = await storageApi.getAll('temperatures');
+    if (existingTemperatures.length === 0 || force) {
+      for (const temp of seedTemperatures) {
+        await storageApi.set('temperatures', temp.id, temp);
+      }
     }
-    console.log('Cafe Vitus database initialized with rich Danish demo dataset.');
+
+    const existingHygiene = await storageApi.getAll('hygiene_checklists');
+    if (existingHygiene.length === 0 || force) {
+      for (const chk of seedHygieneChecklists) {
+        await storageApi.set('hygiene_checklists', chk.id, chk);
+      }
+    }
+
+    console.log('Cafe Vitus database initialized with complete restaurant, staff, and food safety datasets.');
   } catch (err) {
     console.warn('Seeding failed:', err);
   }
 }
+

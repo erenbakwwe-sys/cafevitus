@@ -3,7 +3,8 @@ import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ShoppingBag, Bell, Sun, Moon, MapPin, 
-  Utensils, Clock, LayoutGrid, ChefHat, ShieldCheck, Coffee, Sparkles
+  Utensils, Clock, LayoutGrid, ChefHat, ShieldCheck, Coffee, Sparkles,
+  Calendar, Users, CheckSquare, Award
 } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -13,10 +14,11 @@ import { cn } from '../../lib/utils';
 export interface HeaderProps {
   onCartClick?: () => void;
   onWaiterClick?: () => void;
+  onReserveClick?: () => void;
   tableNumber?: string | null;
 }
 
-export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tableNumber }) => {
+export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onReserveClick, tableNumber }) => {
   const { language, toggleLanguage, t } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
   const { itemCount } = useCart();
@@ -29,9 +31,12 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tabl
   const appModes = [
     { path: `/${tableNumber ? `?table=${tableNumber}` : ''}`, label: t.menu.title, icon: Utensils, match: (p: string) => p === '/' },
     { path: `/order-tracking${tableNumber ? `?table=${tableNumber}` : ''}`, label: t.orderTracking.orders, icon: Clock, match: (p: string) => p.startsWith('/order-tracking') },
+    { path: '/admin/reservations', label: t.admin.navigation.reservations, icon: Calendar, match: (p: string) => p.startsWith('/admin/reservations') },
     { path: '/admin/tables', label: t.admin.navigation.tables, icon: LayoutGrid, match: (p: string) => p === '/admin' || p === '/admin/tables' },
     { path: '/admin/kitchen', label: t.admin.navigation.kitchen, icon: ChefHat, match: (p: string) => p.startsWith('/admin/kitchen') },
-    { path: '/admin/reports', label: t.admin.title, icon: ShieldCheck, match: (p: string) => p.startsWith('/admin/') && p !== '/admin/tables' && p !== '/admin/kitchen' },
+    { path: '/admin/staff', label: t.admin.navigation.staff, icon: Users, match: (p: string) => p.startsWith('/admin/staff') },
+    { path: '/admin/attendance', label: t.admin.navigation.attendance, icon: CheckSquare, match: (p: string) => p.startsWith('/admin/attendance') },
+    { path: '/admin/egenkontrol', label: t.admin.navigation.egenkontrol, icon: Award, match: (p: string) => p.startsWith('/admin/egenkontrol') },
   ];
 
   return (
@@ -161,6 +166,21 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, tabl
                   {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700" />}
                 </motion.div>
               </motion.button>
+
+              {/* Table Reservation Button */}
+              {onReserveClick && (
+                <motion.button
+                  whileHover={{ scale: 1.04 }}
+                  whileTap={{ scale: 0.96 }}
+                  type="button"
+                  onClick={onReserveClick}
+                  className="min-h-[40px] flex items-center gap-1.5 px-3 sm:px-4 py-1.5 sm:py-2 rounded-2xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-900 dark:text-amber-300 border border-amber-500/30 font-extrabold text-xs sm:text-sm transition-colors cursor-pointer shadow-2xs"
+                  title={t.reservations.bookTable}
+                >
+                  <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-600 dark:text-amber-400 shrink-0" />
+                  <span className="hidden md:inline">{t.reservations.bookTable}</span>
+                </motion.button>
+              )}
 
               {/* Waiter Call Button */}
               {onWaiterClick && (

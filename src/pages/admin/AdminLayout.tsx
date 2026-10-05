@@ -3,7 +3,8 @@ import { Outlet, NavLink, useLocation } from 'react-router-dom';
 import { 
   LayoutGrid, ChefHat, UtensilsCrossed, Utensils, QrCode, 
   Package, Wallet, Ticket, BarChart3, LogOut,
-  Moon, Sun, Menu, X, Globe, Compass, Sparkles, Coffee
+  Moon, Sun, Menu, X, Globe, Compass, Sparkles, Coffee,
+  Calendar, Users, CheckSquare, Award
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
@@ -21,7 +22,11 @@ export default function AdminLayout() {
 
   const navItems = [
     { path: '/admin', end: true, icon: LayoutGrid, label: t.admin.navigation.tables },
+    { path: '/admin/reservations', icon: Calendar, label: t.admin.navigation.reservations },
     { path: '/admin/kitchen', icon: ChefHat, label: t.admin.navigation.kitchen },
+    { path: '/admin/staff', icon: Users, label: t.admin.navigation.staff },
+    { path: '/admin/attendance', icon: CheckSquare, label: t.admin.navigation.attendance },
+    { path: '/admin/egenkontrol', icon: Award, label: t.admin.navigation.egenkontrol },
     { path: '/admin/menu', icon: UtensilsCrossed, label: t.admin.navigation.menu },
     { path: '/admin/qr-codes', icon: QrCode, label: t.admin.navigation.qrCodes },
     { path: '/admin/stock', icon: Package, label: t.admin.navigation.stock },
@@ -137,9 +142,9 @@ export default function AdminLayout() {
 
   const mobileBottomNavItems = [
     { path: '/admin', end: true, icon: LayoutGrid, label: t.admin.navigation.tables },
+    { path: '/admin/reservations', icon: Calendar, label: t.admin.navigation.reservations },
     { path: '/admin/kitchen', icon: ChefHat, label: t.admin.navigation.kitchen },
-    { path: '/admin/menu', icon: UtensilsCrossed, label: t.admin.navigation.menu },
-    { path: '/admin/reports', icon: BarChart3, label: t.admin.navigation.reports },
+    { path: '/admin/staff', icon: Users, label: t.admin.navigation.staff },
   ];
 
   return (

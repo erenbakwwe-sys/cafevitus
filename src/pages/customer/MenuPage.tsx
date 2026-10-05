@@ -18,6 +18,9 @@ import { ProductCard } from '../../components/shared/ProductCard';
 import { WaiterCallModal } from '../../components/shared/WaiterCallModal';
 import { CartDrawer } from '../../components/shared/CartDrawer';
 import { ProductDetailModal } from '../../components/shared/ProductDetailModal';
+import { MealTimeSelector, getCurrentMealPeriod, SelectedMealMode } from '../../components/shared/MealTimeSelector';
+import { TableReservationModal } from '../../components/shared/TableReservationModal';
+import { Calendar, Award } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -55,7 +58,9 @@ export function MenuPage() {
   
   const [isWaiterModalOpen, setIsWaiterModalOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<MenuItem | null>(null);
+  const [selectedMealMode, setSelectedMealMode] = useState<SelectedMealMode>('auto');
   const [loading, setLoading] = useState(true);
 
   // When a table param is detected in URL from a QR scan
@@ -106,6 +111,10 @@ export function MenuPage() {
     { id: 'gluten-free', label: '🌾 ' + t.menu.glutenFree },
   ];
 
+  // Dynamic time-based meal period determination
+  const currentAutoPeriod = getCurrentMealPeriod();
+  const effectivePeriod = selectedMealMode === 'auto' ? currentAutoPeriod : selectedMealMode;
+
   const filteredItems = menuItems.filter((item) => {
     const matchesCategory = !activeCategory || item.categoryId === activeCategory;
     const query = searchQuery.toLowerCase().trim();
@@ -116,16 +125,33 @@ export function MenuPage() {
       item.description.en?.toLowerCase().includes(query);
     const matchesTag = !activeTag || item.tags?.includes(activeTag as any);
 
-    return matchesCategory && matchesSearch && matchesTag;
+    // Dynamic Time-Based Meal Period Filtering
+    let matchesMealPeriod = true;
+    if (effectivePeriod !== 'all-day') {
+      if (item.mealPeriods && item.mealPeriods.length > 0) {
+        matchesMealPeriod = item.mealPeriods.includes(effectivePeriod as any) || item.mealPeriods.includes('all-day');
+      } else {
+        if (effectivePeriod === 'breakfast') {
+          matchesMealPeriod = item.categoryId === 'breakfast' || item.categoryId === 'coffee';
+        } else if (effectivePeriod === 'lunch') {
+          matchesMealPeriod = item.categoryId === 'smorrebrod' || item.categoryId === 'salads' || item.categoryId === 'coffee' || item.categoryId === 'drinks';
+        } else if (effectivePeriod === 'dinner') {
+          matchesMealPeriod = item.categoryId === 'smorrebrod' || item.categoryId === 'salads' || item.categoryId === 'drinks' || item.categoryId === 'desserts';
+        }
+      }
+    }
+
+    return matchesCategory && matchesSearch && matchesTag && matchesMealPeriod;
   });
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8F7F2] dark:bg-[#050A14] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-400 pb-20">
-      {/* Universal Header with Scanned Table Indicator */}
+      {/* Universal Header with Scanned Table Indicator & Table Reservation */}
       <Header
         tableNumber={tableParam || null}
         onCartClick={() => setIsCartOpen(true)}
         onWaiterClick={() => setIsWaiterModalOpen(true)}
+        onReserveClick={() => setIsReservationModalOpen(true)}
       />
 
       {/* Hero Section */}
@@ -151,6 +177,40 @@ export function MenuPage() {
 
         {/* 3D Hero Scene */}
         <Hero3D />
+
+        {/* Quick Table Reservation Banner */}
+        <div className="mt-4 p-4 rounded-3xl bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-transparent border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-400 text-slate-950 flex items-center justify-center font-black shadow-md shrink-0">
+              <Calendar className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white font-serif-luxury">
+                {t.reservations.quickReserve}
+              </h3>
+              <p className="text-[11px] font-semibold text-slate-600 dark:text-slate-400">
+                {language === 'da'
+                  ? 'Sikr dit bord forud • 50 DKK No-Show depositum modregnes regningen'
+                  : 'Guarantee your harbor table • 50 DKK deposit credited to bill'}
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsReservationModalOpen(true)}
+            className="px-4 py-2 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-black text-xs transition-colors cursor-pointer whitespace-nowrap shadow-sm self-start sm:self-auto"
+          >
+            {t.reservations.bookTable}
+          </button>
+        </div>
+
+        {/* Meal Time Dynamic Switcher (Corner / Top Bar Selector) */}
+        <div className="mt-4">
+          <MealTimeSelector
+            selectedMode={selectedMealMode}
+            onSelectMode={setSelectedMealMode}
+          />
+        </div>
 
         {/* Search & Dietary Filters Bar */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 mt-4 sm:mt-6">
@@ -318,7 +378,23 @@ export function MenuPage() {
           <p className="text-xs text-slate-400 mt-1 font-medium">{t.common.slogan}</p>
           <p className="text-[11px] text-slate-400 mt-4">© {new Date().getFullYear()} Cafe Vitus. {t.productCard.allRightsReserved}</p>
 
-          <div className="mt-5 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center">
+          {/* Fødevarestyrelsen Elite-Smiley Certified Badge */}
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 text-[11px] font-extrabold shadow-2xs">
+              <Award className="w-4 h-4 text-emerald-500 shrink-0" />
+              <span>{t.egenkontrol.smileyBadge} (100% Godkendt Egenkontrol • Enos Standard)</span>
+            </div>
+          </div>
+
+          <div className="mt-5 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center justify-center gap-3">
+            <button
+              type="button"
+              onClick={() => setIsReservationModalOpen(true)}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-amber-400 text-slate-950 hover:bg-amber-300 text-xs font-black transition-all shadow-2xs cursor-pointer"
+            >
+              <Calendar className="w-3.5 h-3.5" />
+              <span>{t.reservations.bookTable}</span>
+            </button>
             <Link
               to="/admin"
               className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-600 dark:text-slate-400 text-xs font-bold transition-all shadow-2xs"
@@ -337,6 +413,11 @@ export function MenuPage() {
         onClose={() => setIsWaiterModalOpen(false)}
         tableId={tableParam}
         tableNumber={tableParam}
+      />
+
+      <TableReservationModal
+        isOpen={isReservationModalOpen}
+        onClose={() => setIsReservationModalOpen(false)}
       />
 
       <CartDrawer

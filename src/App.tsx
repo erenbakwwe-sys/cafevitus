@@ -16,6 +16,10 @@ import StockPage from './pages/admin/StockPage';
 import ExpensesPage from './pages/admin/ExpensesPage';
 import CouponsPage from './pages/admin/CouponsPage';
 import ReportsPage from './pages/admin/ReportsPage';
+import ReservationsPage from './pages/admin/ReservationsPage';
+import StaffRosterPage from './pages/admin/StaffRosterPage';
+import AttendancePage from './pages/admin/AttendancePage';
+import FoodSafetyPage from './pages/admin/FoodSafetyPage';
 
 const App: React.FC = () => {
   return (
@@ -45,7 +49,11 @@ const App: React.FC = () => {
                 <Route path="/admin" element={<AdminLayout />}>
                   <Route index element={<TablesPage />} />
                   <Route path="tables" element={<TablesPage />} />
+                  <Route path="reservations" element={<ReservationsPage />} />
                   <Route path="kitchen" element={<KitchenPage />} />
+                  <Route path="staff" element={<StaffRosterPage />} />
+                  <Route path="attendance" element={<AttendancePage />} />
+                  <Route path="egenkontrol" element={<FoodSafetyPage />} />
                   <Route path="menu" element={<MenuManagementPage />} />
                   <Route path="qr-codes" element={<QRCodePage />} />
                   <Route path="stock" element={<StockPage />} />
