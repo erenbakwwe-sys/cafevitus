@@ -395,13 +395,13 @@ export function MenuPage() {
             </p>
           </div>
           <p className="text-xs text-slate-400 mt-1 font-medium">{t.common.slogan}</p>
-          <p className="text-[11px] text-slate-400 mt-4">© {new Date().getFullYear()} Cafe Vitus. {t.productCard.allRightsReserved}</p>
+          <p className="text-[11px] text-slate-400 mt-4">© {new Date().getFullYear()} Cafe Vitus. {t.productCard?.allRightsReserved || 'All rights reserved.'}</p>
 
           {/* Fødevarestyrelsen Elite-Smiley Certified Badge */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-800 dark:text-emerald-300 text-[11px] font-extrabold shadow-2xs">
               <Award className="w-4 h-4 text-emerald-500 shrink-0" />
-              <span>{t.egenkontrol.smileyBadge} (100% Godkendt Egenkontrol • Enos Standard)</span>
+              <span>{t.egenkontrol?.smileyBadge || 'Elite-Smiley'} (100% Godkendt Egenkontrol • Enos Standard)</span>
             </div>
           </div>
 
