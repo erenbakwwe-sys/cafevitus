@@ -1,6 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type Language = 'en' | 'da' | 'tr';
+export type Language = 'en' | 'da';
 export type Theme = 'dark' | 'light';
 
 export type LocalizedString = Partial<Record<Language, string>> & { en?: string; da?: string };

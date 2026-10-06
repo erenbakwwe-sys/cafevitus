@@ -34,7 +34,7 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
 
   // Card Form Fields
   const [cardNumber, setCardNumber] = useState('');
-  const [cardHolder, setCardHolder] = useState('EREN DEMIR');
+  const [cardHolder, setCardHolder] = useState('SOFIE MØLLER');
   const [cardExpiry, setCardExpiry] = useState('');
   const [cardCvv, setCardCvv] = useState('');
 
