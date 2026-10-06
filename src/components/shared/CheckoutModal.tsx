@@ -13,7 +13,8 @@ import { playPaymentSuccessSound } from '../../lib/audio';
 import { Order, PaymentMethod } from '../../types';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
-import { checkOrderRateLimit, recordOrderPlaced } from '../../lib/security';
+import { checkOrderRateLimit, recordOrderPlaced, isTableSessionVerified, escapeHtml } from '../../lib/security';
+import { Coupon } from '../../types';
 
 interface CheckoutModalProps {
   isOpen: boolean;
@@ -68,7 +69,13 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
   const handleProcessPayment = async () => {
     if (state.items.length === 0) return;
 
-    // Rate Limit Check
+    // 0. Strict QR Verification Enforcement
+    if (!isTableSessionVerified(tableNumber || tableId)) {
+      toast.error(t.security.securityLockedNotice);
+      return;
+    }
+
+    // 1. Rate Limit Check
     const rateCheck = checkOrderRateLimit(tableId || '5');
     if (!rateCheck.allowed) {
       toast.error(t.cart.rateLimitWait.replace('{seconds}', String(rateCheck.waitSeconds)));
@@ -88,10 +95,10 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
         id: item.id,
         menuItemId: item.menuItem.id,
         name: item.menuItem.name,
-        quantity: item.quantity,
+        quantity: Math.max(1, item.quantity),
         unitPrice: item.menuItem.price,
         selectedCustomizations: item.selectedCustomizations,
-        customerNote: item.customerNote,
+        customerNote: escapeHtml(item.customerNote || ''),
         totalPrice: item.totalPrice,
       }));
 
@@ -109,12 +116,24 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
         isPaid: isOnlinePaid,
         transactionId: isOnlinePaid ? transactionId : undefined,
         paidAt: isOnlinePaid ? Date.now() : undefined,
-        customerNote: state.customerNote,
+        customerNote: escapeHtml(state.customerNote || ''),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
 
       const createdOrderId = await storage.add<Order>('orders', newOrderData as any);
+      
+      // Update coupon usage count
+      if (state.couponCode) {
+        const coupons = await storage.getAll<Coupon>('coupons');
+        const applied = coupons.find(c => c.code.toLowerCase() === state.couponCode?.toLowerCase());
+        if (applied) {
+          await storage.update('coupons', applied.id, {
+            usedCount: (applied.usedCount || 0) + 1,
+          });
+        }
+      }
+
       await storage.update('tables', tableId || '5', { status: 'occupied' });
       recordOrderPlaced(tableId || '5');
 
@@ -135,7 +154,7 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Kvittering #${order.id.slice(0, 6).toUpperCase()} - Cafe Vitus</title>
+        <title>Kvittering #${escapeHtml(order.id.slice(0, 6).toUpperCase())} - Cafe Vitus</title>
         <style>
           body { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.4; padding: 25px; max-width: 320px; margin: auto; }
           .center { text-align: center; }
@@ -152,10 +171,10 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
           <h2 style="margin:0; font-size:20px; letter-spacing:1px;">CAFE VITUS</h2>
           <p class="small" style="margin:4px 0 0 0;">Snekkersten Havn • Strandvejen 88<br/>DK-3070 Snekkersten<br/>CVR: 38492019 • Tlf: +45 49 22 10 30</p>
           <div class="line"></div>
-          <p class="bold" style="margin:0; font-size:14px;">BORD ${order.tableId} • KUNDEKVITTERING</p>
+          <p class="bold" style="margin:0; font-size:14px;">BORD ${escapeHtml(order.tableId)} • KUNDEKVITTERING</p>
           <p class="small" style="margin:2px 0 0 0;">Dato: ${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString()}</p>
-          <p class="small" style="margin:0;">Ordrenr: #${order.id.slice(0, 6).toUpperCase()}</p>
-          ${order.transactionId ? `<p class="small" style="margin:0;">Transaktion: ${order.transactionId}</p>` : ''}
+          <p class="small" style="margin:0;">Ordrenr: #${escapeHtml(order.id.slice(0, 6).toUpperCase())}</p>
+          ${order.transactionId ? `<p class="small" style="margin:0;">Transaktion: ${escapeHtml(order.transactionId)}</p>` : ''}
         </div>
         
         <div class="line"></div>
@@ -166,12 +185,12 @@ export function CheckoutModal({ isOpen, onClose, tableId, tableNumber }: Checkou
 
         ${order.items.map((item) => `
           <div class="row">
-            <span>${item.quantity}x ${item.name[language] || item.name.da || item.name.en}</span>
+            <span>${item.quantity}x ${escapeHtml(item.name[language] || item.name.da || item.name.en)}</span>
             <span>${(item.unitPrice * item.quantity).toFixed(2)} kr</span>
           </div>
           ${item.selectedCustomizations ? item.selectedCustomizations.flatMap(c => c.selectedOptions.map(o => `
             <div class="row small" style="padding-left:10px;">
-              <span>+ ${o.name[language] || o.name.da || o.name.en}</span>
+              <span>+ ${escapeHtml(o.name[language] || o.name.da || o.name.en)}</span>
               <span>${o.price > 0 ? o.price.toFixed(2) + ' kr' : ''}</span>
             </div>
           `)).join('') : ''}

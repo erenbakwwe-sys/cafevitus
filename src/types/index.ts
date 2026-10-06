@@ -117,6 +117,7 @@ export interface Coupon {
   value: number;
   usageLimit: number;
   usedCount: number;
+  minSpend?: number;
   expiresAt: number;
   active: boolean;
   createdAt: number;

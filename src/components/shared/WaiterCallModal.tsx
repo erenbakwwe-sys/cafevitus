@@ -6,6 +6,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
 import { WaiterCall, WaiterCallType } from '../../types';
 import { toast } from 'sonner';
+import { isTableSessionVerified, escapeHtml } from '../../lib/security';
 
 interface WaiterCallModalProps {
   isOpen: boolean;
@@ -39,12 +40,18 @@ export function WaiterCallModal({ isOpen, onClose, tableId, tableNumber }: Waite
   const handleSend = async () => {
     if (!selectedReason) return;
     
+    // Strict QR Table Verification Enforcement
+    if (!isTableSessionVerified(tableNumber || tableId)) {
+      toast.error(t.security.securityLockedNotice);
+      return;
+    }
+
     try {
       await storage.add<WaiterCall>('waiter_calls', {
         tableId: tableId || '5',
         tableNumber: tableNumber || tableId || '5',
         type: selectedReason,
-        message: message.trim() ? message : undefined,
+        message: message.trim() ? escapeHtml(message.trim()) : undefined,
         status: 'active',
         createdAt: Date.now(),
       } as any);

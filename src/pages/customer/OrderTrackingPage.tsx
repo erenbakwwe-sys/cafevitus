@@ -11,6 +11,7 @@ import { Header } from '../../components/layout/Header';
 import { CartDrawer } from '../../components/shared/CartDrawer';
 import { WaiterCallModal } from '../../components/shared/WaiterCallModal';
 import { TripAdvisorReviewCard } from '../../components/shared/TripAdvisorReviewCard';
+import { escapeHtml } from '../../lib/security';
 
 const statusSteps: { id: OrderStatus; icon: React.ReactNode; getKey: (t: any) => string }[] = [
   { id: 'pending', icon: <Clock className="w-5 h-5" />, getKey: (t) => t.orderTracking.pending },
@@ -60,7 +61,7 @@ export function OrderTrackingPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Kvittering #${order.id.slice(0, 6).toUpperCase()} - Cafe Vitus</title>
+        <title>Kvittering #${escapeHtml(order.id.slice(0, 6).toUpperCase())} - Cafe Vitus</title>
         <style>
           body { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.4; padding: 25px; max-width: 320px; margin: auto; }
           .center { text-align: center; }
@@ -76,15 +77,15 @@ export function OrderTrackingPage() {
           <h2 style="margin:0; font-size:20px; letter-spacing:1px;">CAFE VITUS</h2>
           <p class="small" style="margin:4px 0 0 0;">Snekkersten Havn • Strandvejen 88<br/>DK-3070 Snekkersten<br/>CVR: 38492019 • Tlf: +45 49 22 10 30</p>
           <div class="line"></div>
-          <p class="bold" style="margin:0; font-size:14px;">BORD ${order.tableId} • KUNDEKVITTERING</p>
+          <p class="bold" style="margin:0; font-size:14px;">BORD ${escapeHtml(order.tableId)} • KUNDEKVITTERING</p>
           <p class="small" style="margin:2px 0 0 0;">Dato: ${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString()}</p>
-          <p class="small" style="margin:0;">Ordrenr: #${order.id.slice(0, 6).toUpperCase()}</p>
-          ${order.transactionId ? `<p class="small" style="margin:0;">Transaktion: ${order.transactionId}</p>` : ''}
+          <p class="small" style="margin:0;">Ordrenr: #${escapeHtml(order.id.slice(0, 6).toUpperCase())}</p>
+          ${order.transactionId ? `<p class="small" style="margin:0;">Transaktion: ${escapeHtml(order.transactionId)}</p>` : ''}
         </div>
         <div class="line"></div>
         ${order.items.map((item) => `
           <div class="row">
-            <span>${item.quantity}x ${item.name[language] || item.name.da || item.name.en}</span>
+            <span>${item.quantity}x ${escapeHtml(item.name[language] || item.name.da || item.name.en)}</span>
             <span>${(item.unitPrice * item.quantity).toFixed(2)} kr</span>
           </div>
         `).join('')}

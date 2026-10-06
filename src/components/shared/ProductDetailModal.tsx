@@ -13,9 +13,17 @@ export interface ProductDetailModalProps {
   item: MenuItem | null;
   isOpen: boolean;
   onClose: () => void;
+  isVerified?: boolean;
+  onRequireQR?: () => void;
 }
 
-export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, isOpen, onClose }) => {
+export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ 
+  item, 
+  isOpen, 
+  onClose,
+  isVerified = true,
+  onRequireQR,
+}) => {
   const { language, t } = useLanguage();
   const { addItem } = useCart();
   
@@ -74,6 +82,12 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ item, is
   };
 
   const handleAddToCart = () => {
+    if (isVerified === false) {
+      if (onRequireQR) onRequireQR();
+      onClose();
+      return;
+    }
+
     const selectedCustomizations: SelectedCustomization[] = (item.customizations || [])
       .map(group => {
         const selectedIds = selections[group.id] || [];

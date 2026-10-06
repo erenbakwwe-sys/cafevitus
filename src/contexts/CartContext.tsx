@@ -23,21 +23,23 @@ type CartAction =
   | { type: 'CLEAR_CART' };
 
 function calculateItemTotal(unitPrice: number, quantity: number, customizations: SelectedCustomization[]): number {
+  const safeQty = Math.max(1, Math.min(99, Math.floor(quantity)));
   const customizationPrice = customizations.reduce((sum, c) => {
-    return sum + c.selectedOptions.reduce((optSum, opt) => optSum + opt.price, 0);
+    return sum + c.selectedOptions.reduce((optSum, opt) => optSum + Math.max(0, opt.price), 0);
   }, 0);
-  return (unitPrice + customizationPrice) * quantity;
+  return Math.max(0, (Math.max(0, unitPrice) + customizationPrice) * safeQty);
 }
 
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
       const { menuItem, quantity, customizations, note } = action.payload;
-      const totalPrice = calculateItemTotal(menuItem.price, quantity, customizations);
+      const safeQty = Math.max(1, Math.min(99, Math.floor(quantity)));
+      const totalPrice = calculateItemTotal(menuItem.price, safeQty, customizations);
       const newItem: CartItem = {
         id: Date.now().toString(36) + Math.random().toString(36).substr(2, 5),
         menuItem,
-        quantity,
+        quantity: safeQty,
         selectedCustomizations: customizations,
         customerNote: note,
         totalPrice,

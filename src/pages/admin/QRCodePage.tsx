@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { QRCodeCanvas } from 'qrcode.react';
 import { storage } from '../../lib/storage';
 import { Table } from '../../types';
-import { Download, Printer, QrCode, Sparkles, MapPin, Coffee } from 'lucide-react';
+import { Download, Printer, QrCode, Sparkles, MapPin, Coffee, ShieldCheck } from 'lucide-react';
 import { toast } from 'sonner';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { generateTableQRToken } from '../../lib/security';
 
 export default function QRCodePage() {
   const [tables, setTables] = useState<Table[]>([]);
@@ -47,6 +48,7 @@ export default function QRCodePage() {
   const printQR = (tableNumber: string) => {
     const canvas = document.getElementById(`qr-table-${tableNumber}`) as HTMLCanvasElement;
     if (canvas) {
+      const token = generateTableQRToken(tableNumber);
       const printTitle = t.admin.qrCodes.printTitle;
       const printBadge = t.admin.qrCodes.printBadge;
       const printInstruction = t.admin.qrCodes.printInstruction;
@@ -62,7 +64,8 @@ export default function QRCodePage() {
             h1 { margin: 0 0 4px 0; font-size: 26px; font-weight: 900; }
             p.sub { margin: 0 0 20px 0; font-size: 13px; color: #555; }
             img { max-width: 220px; margin-bottom: 20px; border-radius: 12px; }
-            .badge { font-size: 28px; font-weight: 900; background: #000; color: #fff; padding: 8px 24px; border-radius: 16px; display: inline-block; margin-bottom: 12px; }
+            .badge { font-size: 28px; font-weight: 900; background: #000; color: #fff; padding: 8px 24px; border-radius: 16px; display: inline-block; margin-bottom: 8px; }
+            .token { font-family: monospace; font-size: 13px; font-weight: bold; background: #f3f4f6; padding: 4px 12px; border-radius: 8px; display: inline-block; margin-bottom: 12px; letter-spacing: 1px; }
             .instruction { font-size: 12px; color: #666; font-weight: 600; }
           </style>
         </head>
@@ -73,6 +76,9 @@ export default function QRCodePage() {
             <img src="${canvas.toDataURL()}"/>
             <div>
               <div class="badge">${printBadge} ${tableNumber}</div>
+            </div>
+            <div>
+              <div class="token">Kode: ${token}</div>
             </div>
             <p class="instruction">${printInstruction}</p>
           </div>
@@ -129,7 +135,8 @@ export default function QRCodePage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 print:grid-cols-2 print:gap-8">
         {tables.map((table) => {
-          const orderUrl = `${origin}/?table=${table.number}`;
+          const token = generateTableQRToken(table.number);
+          const orderUrl = `${origin}/?table=${table.number}&qr=${token}`;
           
           return (
             <div 
@@ -155,9 +162,15 @@ export default function QRCodePage() {
               </div>
               
               {/* Big Bold Dedicated Table Badge */}
-              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-slate-950 text-white dark:bg-amber-500 dark:text-slate-950 font-black text-base mb-4 shadow-sm">
+              <div className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-xl bg-slate-950 text-white dark:bg-amber-500 dark:text-slate-950 font-black text-base mb-2 shadow-sm">
                 <MapPin className="w-4 h-4" />
                 <span>{t.table.tableNumber} {table.number}</span>
+              </div>
+
+              {/* Cryptographic Security Token */}
+              <div className="inline-flex items-center gap-1 px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-mono text-xs font-black mb-3 border border-slate-200 dark:border-slate-700">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Kode: {token}</span>
               </div>
 
               <p className="text-[11px] text-slate-400 font-semibold mb-5 print:hidden">

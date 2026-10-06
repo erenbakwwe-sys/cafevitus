@@ -13,8 +13,9 @@ import { toast } from 'sonner';
 import { Order, Coupon } from '../../types';
 import { useNavigate } from 'react-router-dom';
 import { CheckoutModal } from './CheckoutModal';
+import { QRScanRequiredModal } from './QRScanRequiredModal';
 
-import { checkOrderRateLimit, recordOrderPlaced } from '../../lib/security';
+import { checkOrderRateLimit, recordOrderPlaced, isTableSessionVerified, escapeHtml } from '../../lib/security';
 
 interface CartDrawerProps {
   isOpen: boolean;
@@ -44,6 +45,7 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
   const [couponCode, setCouponCodeInput] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
 
   const paymentMethods = [
     { id: 'card' as const, icon: <CreditCard className="h-5 w-5" />, label: t.cart.payCard },
@@ -59,7 +61,16 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
         (c) => c.code.toLowerCase() === couponCode.toLowerCase() && c.active && c.expiresAt > Date.now()
       );
       if (coupon) {
-        const discount = coupon.type === 'percentage' ? (subtotal * coupon.value) / 100 : coupon.value;
+        if (coupon.usageLimit && (coupon.usedCount || 0) >= coupon.usageLimit) {
+          toast.error(language === 'da' ? 'Kuponens maksimale forbrugsgrænse er nået.' : 'Coupon usage limit reached.');
+          return;
+        }
+        if (coupon.minSpend && subtotal < coupon.minSpend) {
+          toast.error(language === 'da' ? `Mindste ordrebeløb er ${coupon.minSpend} kr.` : `Minimum order spend is ${coupon.minSpend} kr.`);
+          return;
+        }
+        const calculatedDiscount = coupon.type === 'percentage' ? (subtotal * coupon.value) / 100 : coupon.value;
+        const discount = Math.min(subtotal, Math.max(0, calculatedDiscount));
         setCoupon(coupon.code, discount);
         toast.success(t.cart.couponApplied);
       } else {
@@ -72,6 +83,13 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
 
   const handlePlaceOrder = async () => {
     if (state.items.length === 0) return;
+
+    // 0. QR Code Table Verification Enforcement
+    if (!isTableSessionVerified(tableNumber || tableId)) {
+      setIsQRModalOpen(true);
+      toast.info(t.security.securityLockedNotice);
+      return;
+    }
 
     // 1. Anti-Spam Rate Limit Check
     const rateCheck = checkOrderRateLimit(tableId || '5');
@@ -89,10 +107,10 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
         id: item.id,
         menuItemId: item.menuItem.id,
         name: item.menuItem.name,
-        quantity: item.quantity,
+        quantity: Math.max(1, item.quantity),
         unitPrice: item.menuItem.price,
         selectedCustomizations: item.selectedCustomizations,
-        customerNote: item.customerNote,
+        customerNote: escapeHtml(item.customerNote || ''),
         totalPrice: item.totalPrice,
       }));
 
@@ -105,10 +123,21 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
         total,
         status: 'pending',
         paymentMethod: state.paymentMethod,
-        customerNote: state.customerNote,
+        customerNote: escapeHtml(state.customerNote || ''),
         createdAt: Date.now(),
         updatedAt: Date.now(),
       } as any);
+
+      // Increment coupon usedCount if applied
+      if (state.couponCode) {
+        const coupons = await storage.getAll<Coupon>('coupons');
+        const applied = coupons.find(c => c.code.toLowerCase() === state.couponCode?.toLowerCase());
+        if (applied) {
+          await storage.update('coupons', applied.id, {
+            usedCount: (applied.usedCount || 0) + 1,
+          });
+        }
+      }
 
       await storage.update('tables', tableId || '5', { status: 'occupied' });
       recordOrderPlaced(tableId || '5');
@@ -379,7 +408,14 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   type="button"
-                  onClick={() => setIsCheckoutOpen(true)}
+                  onClick={() => {
+                    if (!isTableSessionVerified(tableNumber || tableId)) {
+                      setIsQRModalOpen(true);
+                      toast.info(t.security.securityLockedNotice);
+                      return;
+                    }
+                    setIsCheckoutOpen(true);
+                  }}
                   disabled={state.items.length === 0}
                   className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 dark:bg-amber-400 dark:hover:bg-amber-500 text-white dark:text-slate-950 font-black text-xs sm:text-sm shadow-xl transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 min-h-[50px]"
                 >
@@ -401,6 +437,17 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
         }}
         tableId={tableId || '5'}
         tableNumber={tableNumber || tableId || '5'}
+      />
+
+      {/* QR Code Verification Barrier */}
+      <QRScanRequiredModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+        onVerified={() => {
+          setIsQRModalOpen(false);
+          setIsCheckoutOpen(true);
+        }}
+        currentTable={tableNumber || tableId}
       />
     </AnimatePresence>
   );

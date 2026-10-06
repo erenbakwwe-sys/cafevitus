@@ -9,6 +9,7 @@ import { storage } from '../../lib/storage';
 import { Table, Order, WaiterCall, TableStatus } from '../../types';
 import { formatCurrency, formatTime, getTableStatusColor, cn } from '../../lib/utils';
 import { toast } from 'sonner';
+import { escapeHtml } from '../../lib/security';
 
 export default function TablesPage() {
   const { t, language } = useLanguage();
@@ -104,7 +105,7 @@ export default function TablesPage() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>${t.admin.tables.receiptTitle} ${table.number}</title>
+        <title>${t.admin.tables.receiptTitle} ${escapeHtml(table.number)}</title>
         <style>
           body { font-family: 'Courier New', monospace; font-size: 13px; padding: 20px; max-width: 300px; margin: auto; }
           .center { text-align: center; }
@@ -118,7 +119,7 @@ export default function TablesPage() {
           <h2>CAFE VITUS</h2>
           <p>Snekkersten Havn<br/>DK-3070 Snekkersten<br/>CVR: 12345678</p>
           <div class="line"></div>
-          <p class="bold">${t.table.tableNumber.toUpperCase()} ${table.number} • ${t.admin.tables.receiptHeader}</p>
+          <p class="bold">${t.table.tableNumber.toUpperCase()} ${escapeHtml(table.number)} • ${t.admin.tables.receiptHeader}</p>
           <p>${new Date().toLocaleString(language === 'da' ? 'da-DK' : 'en-US')}</p>
         </div>
         <div class="line"></div>
@@ -127,7 +128,7 @@ export default function TablesPage() {
           .map(
             (item) => `
           <div class="row">
-            <span>${item.quantity}x ${item.name[language] || item.name.da || item.name.en}</span>
+            <span>${item.quantity}x ${escapeHtml(item.name[language] || item.name.da || item.name.en)}</span>
             <span>${(item.unitPrice * item.quantity).toFixed(2)} kr</span>
           </div>
         `

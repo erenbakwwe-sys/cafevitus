@@ -20,7 +20,9 @@ import { CartDrawer } from '../../components/shared/CartDrawer';
 import { ProductDetailModal } from '../../components/shared/ProductDetailModal';
 import { MealTimeSelector, getCurrentMealPeriod, SelectedMealMode } from '../../components/shared/MealTimeSelector';
 import { TableReservationModal } from '../../components/shared/TableReservationModal';
-import { Calendar, Award } from 'lucide-react';
+import { QRScanRequiredModal } from '../../components/shared/QRScanRequiredModal';
+import { isTableSessionVerified, setVerifiedTableSession, verifyTableQRToken } from '../../lib/security';
+import { Calendar, Award, QrCode } from 'lucide-react';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -40,11 +42,15 @@ const itemVariants = {
 export function MenuPage() {
   const [searchParams] = useSearchParams();
   
-  // Read table from URL params or stored session
+  // Read table and token from URL params or stored session
   const urlTable = searchParams.get('table') || searchParams.get('t') || searchParams.get('tableId') || searchParams.get('masa');
-  const storedTable = typeof window !== 'undefined' ? (sessionStorage.getItem('cafe_vitus_table') || localStorage.getItem('cafe_vitus_table')) : null;
+  const qrToken = searchParams.get('qr') || searchParams.get('token');
+  const storedTable = typeof window !== 'undefined' ? (sessionStorage.getItem('cv_verified_table') || localStorage.getItem('cv_verified_table') || sessionStorage.getItem('cafe_vitus_table')) : null;
   
   const [tableParam, setTableParam] = useState<string>(urlTable || storedTable || '1');
+  const [isVerified, setIsVerified] = useState<boolean>(() => isTableSessionVerified(urlTable || storedTable));
+  const [isQRModalOpen, setIsQRModalOpen] = useState(false);
+  const [pendingItemToAdd, setPendingItemToAdd] = useState<MenuItem | null>(null);
   
   const { t, language } = useLanguage();
   const { isDark } = useTheme();
@@ -63,14 +69,46 @@ export function MenuPage() {
   const [selectedMealMode, setSelectedMealMode] = useState<SelectedMealMode>('auto');
   const [loading, setLoading] = useState(true);
 
-  // When a table param is detected in URL from a QR scan
+  // Cryptographic QR Token Verification & Session Handling
   useEffect(() => {
-    if (urlTable) {
+    if (urlTable && qrToken) {
+      if (verifyTableQRToken(urlTable, qrToken)) {
+        setVerifiedTableSession(urlTable, qrToken);
+        setTableParam(urlTable);
+        setIsVerified(true);
+        toast.success(`${t.table.tableNumber} ${urlTable}: ${t.security.successVerified}`);
+      } else {
+        toast.error(t.security.invalidCode);
+        setIsVerified(false);
+      }
+    } else if (urlTable) {
+      const verified = isTableSessionVerified(urlTable);
       setTableParam(urlTable);
-      sessionStorage.setItem('cafe_vitus_table', urlTable);
-      localStorage.setItem('cafe_vitus_table', urlTable);
+      setIsVerified(verified);
+    } else {
+      const verified = isTableSessionVerified();
+      setIsVerified(verified);
+      if (verified) {
+        const stored = sessionStorage.getItem('cv_verified_table') || localStorage.getItem('cv_verified_table');
+        if (stored) setTableParam(stored);
+      }
     }
-  }, [urlTable, language]);
+  }, [urlTable, qrToken, language]);
+
+  const handleVerifiedTable = (verifiedTable: string) => {
+    setTableParam(verifiedTable);
+    setIsVerified(true);
+    if (pendingItemToAdd) {
+      if (pendingItemToAdd.customizations && pendingItemToAdd.customizations.length > 0) {
+        setSelectedProduct(pendingItemToAdd);
+      } else {
+        addItem(pendingItemToAdd, 1, []);
+        const itemName = pendingItemToAdd.name[language] || pendingItemToAdd.name.en || pendingItemToAdd.name.da;
+        toast.success(`${itemName} ${t.menu.itemAdded}`);
+      }
+      setPendingItemToAdd(null);
+    }
+  };
 
   useEffect(() => {
     const init = async () => {
@@ -112,6 +150,13 @@ export function MenuPage() {
   }, []);
 
   const handleQuickAdd = (item: MenuItem) => {
+    if (!isVerified) {
+      setPendingItemToAdd(item);
+      setIsQRModalOpen(true);
+      toast.info(t.security.securityLockedNotice);
+      return;
+    }
+
     if (item.customizations && item.customizations.length > 0) {
       setSelectedProduct(item);
     } else {
@@ -167,30 +212,57 @@ export function MenuPage() {
     <div className="min-h-screen flex flex-col bg-[#F8F7F2] dark:bg-[#050A14] text-slate-900 dark:text-slate-100 font-sans transition-colors duration-400 pb-20">
       {/* Universal Header with Scanned Table Indicator & Table Reservation */}
       <Header
-        tableNumber={tableParam || null}
+        tableNumber={isVerified ? tableParam : null}
         onCartClick={() => setIsCartOpen(true)}
-        onWaiterClick={() => setIsWaiterModalOpen(true)}
+        onWaiterClick={() => {
+          if (!isVerified) {
+            setIsQRModalOpen(true);
+            toast.info(t.security.securityLockedNotice);
+          } else {
+            setIsWaiterModalOpen(true);
+          }
+        }}
         onReserveClick={() => setIsReservationModalOpen(true)}
       />
 
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-6 pb-1 w-full">
-        {/* Scanned Table Confirmation Bar for Mobile */}
-        {tableParam && (
+        {/* Scanned Table Confirmation Bar or Browse Mode Alert */}
+        {isVerified ? (
           <motion.div 
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mb-3.5 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/35 flex items-center justify-between text-amber-900 dark:text-amber-300 text-xs font-black shadow-2xs backdrop-blur-md"
+            className="mb-3.5 p-3.5 rounded-2xl bg-emerald-500/15 border border-emerald-500/35 flex items-center justify-between text-emerald-950 dark:text-emerald-300 text-xs font-black shadow-2xs backdrop-blur-md"
           >
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-beacon" />
               <span>
-                {`${t.table.tableNumber} ${tableParam} ${t.productCard.scannedTableActive}`}
+                {`${t.table.tableNumber} ${tableParam} • ${t.security.verifiedBadge}`}
               </span>
             </div>
-            <div className="text-[11px] font-bold text-amber-800 dark:text-amber-400">
+            <div className="text-[11px] font-bold text-emerald-800 dark:text-emerald-400">
               {t.productCard.harborLocation}
             </div>
+          </motion.div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mb-3.5 p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/35 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-amber-950 dark:text-amber-300 text-xs font-black shadow-2xs backdrop-blur-md"
+          >
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span>
+                {t.security.browseOnlyNotice}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setIsQRModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-slate-950 text-xs font-black transition-colors cursor-pointer whitespace-nowrap shadow-xs self-stretch sm:self-auto text-center"
+            >
+              {t.security.verifyButton}
+            </button>
           </motion.div>
         )}
 
@@ -361,7 +433,14 @@ export function MenuPage() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               type="button"
-              onClick={() => setIsCartOpen(true)}
+              onClick={() => {
+                if (!isVerified) {
+                  setIsQRModalOpen(true);
+                  toast.info(t.security.securityLockedNotice);
+                } else {
+                  setIsCartOpen(true);
+                }
+              }}
               className="w-full flex items-center justify-between p-3.5 sm:p-4 px-4 sm:px-6 rounded-2xl bg-slate-950 dark:bg-amber-400 text-white dark:text-slate-950 font-black shadow-2xl transition-all cursor-pointer border border-slate-800 dark:border-amber-300 group min-h-[58px]"
             >
               <div className="flex items-center gap-3">
@@ -450,6 +529,19 @@ export function MenuPage() {
         isOpen={!!selectedProduct}
         item={selectedProduct}
         onClose={() => setSelectedProduct(null)}
+        isVerified={isVerified}
+        onRequireQR={() => {
+          setSelectedProduct(null);
+          setIsQRModalOpen(true);
+          toast.info(t.security.securityLockedNotice);
+        }}
+      />
+
+      <QRScanRequiredModal
+        isOpen={isQRModalOpen}
+        onClose={() => setIsQRModalOpen(false)}
+        onVerified={handleVerifiedTable}
+        currentTable={tableParam}
       />
     </div>
   );

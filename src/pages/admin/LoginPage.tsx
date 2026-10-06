@@ -6,23 +6,52 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { cn } from '../../lib/utils';
+import { checkAdminLoginAttempts, recordAdminFailedAttempt, resetAdminAttempts } from '../../lib/security';
+import { toast } from 'sonner';
 
 export default function LoginPage() {
   const [pin, setPin] = useState(['', '', '', '']);
   const [error, setError] = useState(false);
+  const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const { login } = useAuth();
   const { language, t, setLanguage } = useLanguage();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
+  // Check lockout on mount
   useEffect(() => {
-    if (inputRefs.current[0]) {
-      inputRefs.current[0].focus();
+    const status = checkAdminLoginAttempts();
+    if (!status.allowed && status.waitSeconds) {
+      setLockoutSeconds(status.waitSeconds);
     }
   }, []);
 
+  // Lockout countdown timer
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    if (lockoutSeconds > 0) {
+      timer = setTimeout(() => {
+        setLockoutSeconds((prev) => {
+          if (prev <= 1) {
+            resetAdminAttempts();
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [lockoutSeconds]);
+
+  useEffect(() => {
+    if (inputRefs.current[0] && lockoutSeconds === 0) {
+      inputRefs.current[0].focus();
+    }
+  }, [lockoutSeconds]);
+
   const handleChange = (index: number, value: string) => {
+    if (lockoutSeconds > 0) return;
     if (!/^\d*$/.test(value)) return;
 
     const newPin = [...pin];
@@ -36,9 +65,27 @@ export default function LoginPage() {
 
     if (newPin.every(digit => digit !== '')) {
       const pinCode = newPin.join('');
+      const status = checkAdminLoginAttempts();
+      if (!status.allowed && status.waitSeconds) {
+        setLockoutSeconds(status.waitSeconds);
+        toast.error(t.security.lockedOutTimer.replace('{seconds}', String(status.waitSeconds)));
+        setPin(['', '', '', '']);
+        return;
+      }
+
       const success = login(pinCode);
-      if (!success) {
+      if (success) {
+        resetAdminAttempts();
+        toast.success(t.common.success);
+      } else {
         setError(true);
+        const result = recordAdminFailedAttempt();
+        if (result.locked) {
+          setLockoutSeconds(result.waitSeconds);
+          toast.error(t.security.lockedOutTimer.replace('{seconds}', String(result.waitSeconds)));
+        } else {
+          toast.error(`${t.admin.wrongPin} (${result.attemptsLeft} forsøg tilbage)`);
+        }
         setTimeout(() => {
           setPin(['', '', '', '']);
           setError(false);
@@ -141,6 +188,17 @@ export default function LoginPage() {
           </p>
         </div>
 
+        {lockoutSeconds > 0 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mb-5 p-3 rounded-2xl bg-red-500/15 border border-red-500/30 text-red-600 dark:text-red-400 text-xs font-black text-center flex items-center justify-center gap-2 shadow-xs"
+          >
+            <Lock className="w-4 h-4 text-red-500 animate-pulse" />
+            <span>{t.security.lockedOutTimer.replace('{seconds}', String(lockoutSeconds))}</span>
+          </motion.div>
+        )}
+
         <motion.div
           animate={error ? { x: [-10, 10, -10, 10, 0] } : {}}
           transition={{ duration: 0.4 }}
@@ -153,16 +211,19 @@ export default function LoginPage() {
               type="password"
               inputMode="numeric"
               pattern="[0-9]*"
+              disabled={lockoutSeconds > 0}
               value={digit}
               onChange={(e) => handleChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
               className={cn(
                 "w-13 h-15 sm:w-14 sm:h-16 text-center text-2xl font-black rounded-2xl border-2 transition-all outline-none bg-slate-50 dark:bg-slate-900 shadow-inner",
-                error 
-                  ? "border-red-500 text-red-500 ring-2 ring-red-500/20" 
-                  : digit 
-                    ? "border-amber-400 text-amber-600 dark:text-amber-400 ring-2 ring-amber-400/20" 
-                    : "border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-amber-400"
+                lockoutSeconds > 0
+                  ? "border-slate-300 dark:border-slate-800 opacity-40 cursor-not-allowed"
+                  : error 
+                    ? "border-red-500 text-red-500 ring-2 ring-red-500/20" 
+                    : digit 
+                      ? "border-amber-400 text-amber-600 dark:text-amber-400 ring-2 ring-amber-400/20" 
+                      : "border-slate-200 dark:border-slate-800 text-slate-900 dark:text-white focus:border-amber-400"
               )}
             />
           ))}
@@ -184,8 +245,9 @@ export default function LoginPage() {
             <button
               key={num}
               type="button"
+              disabled={lockoutSeconds > 0}
               onClick={() => handleNumpadClick(num.toString())}
-              className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs cursor-pointer"
+              className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {num}
             </button>
@@ -193,15 +255,17 @@ export default function LoginPage() {
           <div />
           <button
             type="button"
+            disabled={lockoutSeconds > 0}
             onClick={() => handleNumpadClick('0')}
-            className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs cursor-pointer"
+            className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-amber-400 hover:text-slate-950 dark:hover:bg-amber-400 dark:hover:text-slate-950 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             0
           </button>
           <button
             type="button"
+            disabled={lockoutSeconds > 0}
             onClick={handleNumpadBackspace}
-            className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-red-100 dark:hover:bg-red-950/50 hover:text-red-600 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs flex items-center justify-center cursor-pointer"
+            className="h-13 sm:h-14 rounded-2xl bg-slate-100 dark:bg-slate-800/80 hover:bg-red-100 dark:hover:bg-red-950/50 hover:text-red-600 text-slate-900 dark:text-white text-xl font-black transition-all active:scale-95 border border-slate-200/60 dark:border-slate-700/60 shadow-xs flex items-center justify-center cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             aria-label="Backspace"
           >
             ⌫
