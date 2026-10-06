@@ -84,6 +84,16 @@ export default function TablesPage() {
     toast.success(`${t.table.tableNumber} ${table.number} ${t.admin.tables.closeAndPay}`);
   };
 
+  const handleMarkAsPaid = async (orderId: string) => {
+    await storage.update('orders', orderId, {
+      isPaid: true,
+      paymentStatus: 'paid',
+      transactionId: `POS-${Math.floor(100000 + Math.random() * 900000)}`,
+      paidAt: Date.now(),
+    });
+    toast.success(t.common.success || 'Betaling registreret');
+  };
+
   const calculateSubtotal = (tableOrders: Order[]) => {
     return tableOrders.reduce((sum, order) => sum + order.total, 0);
   };
@@ -281,9 +291,18 @@ export default function TablesPage() {
                   <div className="text-xs font-black px-3 py-0.5 rounded-full bg-sky-500/20 text-sky-900 dark:text-sky-200 Outfit">
                     {formatCurrency(calculateSubtotal(tOrders))}
                   </div>
-                  {hasPendingOrders && (
-                    <span className="text-[10px] bg-amber-400 text-slate-950 px-2.5 py-0.5 rounded-md font-black shadow-2xs">
+                  {hasPendingOrders ? (
+                    <span className="text-[10px] bg-amber-400 text-slate-950 px-2 py-0.5 rounded-md font-black shadow-2xs">
                       {t.admin.tables.approval}
+                    </span>
+                  ) : (
+                    <span className={cn(
+                      "text-[9px] px-2 py-0.5 rounded-md font-black tracking-wide uppercase",
+                      tOrders.every((o) => o.isPaid)
+                        ? "bg-emerald-500/25 text-emerald-800 dark:text-emerald-300"
+                        : "bg-amber-500/25 text-amber-800 dark:text-amber-300"
+                    )}>
+                      {tOrders.every((o) => o.isPaid) ? 'BETALT' : 'AFVENTER'}
                     </span>
                   )}
                 </div>
@@ -357,7 +376,28 @@ export default function TablesPage() {
                         )}
                       >
                         <div className="text-xs font-bold text-slate-500 mb-3 pb-2 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                          <span className="font-mono font-bold">#{order.id.slice(0, 6).toUpperCase()} • {order.paymentMethod || t.cart.atTable}</span>
+                          <div>
+                            <span className="font-mono font-bold">#{order.id.slice(0, 6).toUpperCase()}</span>
+                            <div className="flex items-center gap-1.5 mt-0.5">
+                              <span className={cn(
+                                "px-2 py-0.5 rounded-md text-[9px] font-black uppercase tracking-wider",
+                                order.isPaid
+                                  ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30"
+                                  : "bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/30"
+                              )}>
+                                {order.isPaid ? `BETALT (${order.paymentMethod?.toUpperCase()})` : 'AFVENTER BETALING'}
+                              </span>
+                              {!order.isPaid && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleMarkAsPaid(order.id)}
+                                  className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 hover:underline cursor-pointer"
+                                >
+                                  [Modtag]
+                                </button>
+                              )}
+                            </div>
+                          </div>
                           <div className="flex items-center gap-2">
                             <span className={cn(
                               "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider",

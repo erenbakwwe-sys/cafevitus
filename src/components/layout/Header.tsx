@@ -142,7 +142,7 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onRe
                   type="button"
                   onClick={() => setLanguage('da')}
                   className={cn(
-                    "px-1.5 sm:px-2.5 py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1",
+                    "px-1.5 sm:px-2 py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1",
                     language === 'da'
                       ? "bg-amber-400 text-slate-950 shadow-xs"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -156,7 +156,7 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onRe
                   type="button"
                   onClick={() => setLanguage('en')}
                   className={cn(
-                    "px-1.5 sm:px-2.5 py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1",
+                    "px-1.5 sm:px-2 py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1",
                     language === 'en'
                       ? "bg-amber-400 text-slate-950 shadow-xs"
                       : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
@@ -165,6 +165,20 @@ export const Header: React.FC<HeaderProps> = ({ onCartClick, onWaiterClick, onRe
                 >
                   <span>🇬🇧</span>
                   <span className="tracking-wide">EN</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('tr')}
+                  className={cn(
+                    "px-1.5 sm:px-2 py-1 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-black transition-all cursor-pointer flex items-center gap-0.5 sm:gap-1",
+                    language === 'tr'
+                      ? "bg-amber-400 text-slate-950 shadow-xs"
+                      : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                  )}
+                  title="Türkçe"
+                >
+                  <span>🇹🇷</span>
+                  <span className="tracking-wide">TR</span>
                 </button>
               </div>
 

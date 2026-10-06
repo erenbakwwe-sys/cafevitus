@@ -12,6 +12,7 @@ import { storage } from '../../lib/storage';
 import { toast } from 'sonner';
 import { Order, Coupon } from '../../types';
 import { useNavigate } from 'react-router-dom';
+import { CheckoutModal } from './CheckoutModal';
 
 import { checkOrderRateLimit, recordOrderPlaced } from '../../lib/security';
 
@@ -42,6 +43,7 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
 
   const [couponCode, setCouponCodeInput] = useState('');
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
+  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
   const paymentMethods = [
     { id: 'card' as const, icon: <CreditCard className="h-5 w-5" />, label: t.cart.payCard },
@@ -377,11 +379,11 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.97 }}
                   type="button"
-                  onClick={handlePlaceOrder}
-                  disabled={state.items.length === 0 || isPlacingOrder}
+                  onClick={() => setIsCheckoutOpen(true)}
+                  disabled={state.items.length === 0}
                   className="w-full py-4 rounded-2xl bg-slate-950 hover:bg-slate-900 dark:bg-amber-400 dark:hover:bg-amber-500 text-white dark:text-slate-950 font-black text-xs sm:text-sm shadow-xl transition-all disabled:opacity-50 cursor-pointer flex items-center justify-center gap-2 min-h-[50px]"
                 >
-                  <span>{isPlacingOrder ? t.common.loading : t.cart.placeOrder}</span>
+                  <span>{t.cart.proceedToCheckout || t.cart.placeOrder}</span>
                   <ArrowRight className="w-4 h-4" />
                 </motion.button>
               </div>
@@ -389,6 +391,17 @@ export function CartDrawer({ isOpen, onClose, tableId, tableNumber }: CartDrawer
           </motion.div>
         </>
       )}
+
+      {/* Interactive Luxury Checkout & Receipt Modal */}
+      <CheckoutModal
+        isOpen={isCheckoutOpen}
+        onClose={() => {
+          setIsCheckoutOpen(false);
+          onClose();
+        }}
+        tableId={tableId || '5'}
+        tableNumber={tableNumber || tableId || '5'}
+      />
     </AnimatePresence>
   );
 }

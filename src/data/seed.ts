@@ -2,6 +2,7 @@ import {
   Category,
   MenuItem,
   Table,
+  Order,
   Coupon,
   StockItem,
   TableReservation,
@@ -453,14 +454,81 @@ export const seedMenuItems: MenuItem[] = [
 
 export const seedTables: Table[] = Array.from({ length: 15 }, (_, i) => {
   const num = (i + 1).toString();
+  const isTable3 = num === '3';
+  const isTable7 = num === '7';
   return {
     id: `table-${num}`,
     number: num,
-    status: 'empty',
-    currentOrderIds: [],
+    status: isTable3 || isTable7 ? 'occupied' : 'empty',
+    currentOrderIds: isTable3 ? ['ord-live-01'] : isTable7 ? ['ord-live-02'] : [],
     capacity: i < 4 ? 2 : i < 10 ? 4 : 6,
   };
 });
+
+export const seedOrders: Order[] = [
+  {
+    id: 'ord-live-01',
+    tableId: '3',
+    status: 'preparing',
+    items: [
+      {
+        id: 'oi-1',
+        menuItemId: 'din-bouillabaisse',
+        name: { da: 'Snekkersten Havn Bouillabaisse', en: 'Snekkersten Harbor Seafood Bouillabaisse' },
+        quantity: 2,
+        unitPrice: 185,
+        selectedCustomizations: [],
+        totalPrice: 370,
+      },
+      {
+        id: 'oi-2',
+        menuItemId: 'c-flat-white',
+        name: { da: 'Flat White Barista', en: 'Flat White' },
+        quantity: 2,
+        unitPrice: 48,
+        selectedCustomizations: [],
+        totalPrice: 96,
+      },
+    ],
+    subtotal: 466,
+    discount: 0,
+    tip: 34,
+    total: 500,
+    paymentMethod: 'mobilepay',
+    paymentStatus: 'paid',
+    isPaid: true,
+    transactionId: 'TXN-88492019',
+    paidAt: Date.now() - 8 * 60 * 1000,
+    createdAt: Date.now() - 8 * 60 * 1000,
+    updatedAt: Date.now() - 5 * 60 * 1000,
+  },
+  {
+    id: 'ord-live-02',
+    tableId: '7',
+    status: 'pending',
+    items: [
+      {
+        id: 'oi-3',
+        menuItemId: 'sm-salmon',
+        name: { da: 'Røget Laks Smørrebrød', en: 'Smoked Salmon Smørrebrød' },
+        quantity: 1,
+        unitPrice: 135,
+        selectedCustomizations: [],
+        customerNote: 'Uden dild tak',
+        totalPrice: 135,
+      },
+    ],
+    subtotal: 135,
+    discount: 0,
+    tip: 0,
+    total: 135,
+    paymentMethod: 'card',
+    paymentStatus: 'pending',
+    isPaid: false,
+    createdAt: Date.now() - 3 * 60 * 1000,
+    updatedAt: Date.now() - 3 * 60 * 1000,
+  },
+];
 
 export const seedCoupons: Coupon[] = [
   {
@@ -916,6 +984,7 @@ export async function seedDatabase(storageApi: any, force = false): Promise<void
 
     if (storageApi.setAll) {
       const tasks: Promise<any>[] = [];
+      if (!checkCollection('orders') || force) tasks.push(storageApi.setAll('orders', seedOrders));
       if (!checkCollection('reservations') || force) tasks.push(storageApi.setAll('reservations', seedReservations));
       if (!checkCollection('staff') || force) tasks.push(storageApi.setAll('staff', seedStaff));
       if (!checkCollection('shifts') || force) tasks.push(storageApi.setAll('shifts', seedShifts));
@@ -924,6 +993,13 @@ export async function seedDatabase(storageApi: any, force = false): Promise<void
       if (!checkCollection('hygiene_checklists') || force) tasks.push(storageApi.setAll('hygiene_checklists', seedHygieneChecklists));
       if (tasks.length > 0) await Promise.all(tasks);
     } else {
+      const existingOrders = await storageApi.getAll('orders');
+      if (existingOrders.length === 0 || force) {
+        for (const ord of seedOrders) {
+          await storageApi.set('orders', ord.id, ord);
+        }
+      }
+
       const existingReservations = await storageApi.getAll('reservations');
       if (existingReservations.length === 0 || force) {
         for (const res of seedReservations) {

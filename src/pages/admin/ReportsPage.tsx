@@ -94,7 +94,7 @@ export default function ReportsPage() {
     const items = new Map<string, number>();
     filteredOrders.forEach((o) => {
       o.items.forEach((item) => {
-        const name = item.name[language] || item.name.en;
+        const name = item.name[language] || item.name.en || item.name.da || 'Item';
         items.set(name, (items.get(name) || 0) + item.quantity);
       });
     });

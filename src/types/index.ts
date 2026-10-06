@@ -1,9 +1,9 @@
 import { Timestamp } from 'firebase/firestore';
 
-export type Language = 'en' | 'da';
+export type Language = 'en' | 'da' | 'tr';
 export type Theme = 'dark' | 'light';
 
-export type LocalizedString = Record<Language, string>;
+export type LocalizedString = Partial<Record<Language, string>> & { en?: string; da?: string };
 
 export type DietTag = 'vegan' | 'vegetarian' | 'gluten-free' | 'sugar-free' | 'dairy-free' | 'chef-pick';
 
@@ -47,7 +47,8 @@ export interface MenuItem {
 }
 
 export type OrderStatus = 'pending' | 'preparing' | 'ready' | 'delivered' | 'paid' | 'completed' | 'cancelled';
-export type PaymentMethod = 'cash' | 'card' | 'counter';
+export type PaymentMethod = 'cash' | 'card' | 'counter' | 'mobilepay' | 'apple_pay';
+export type PaymentStatus = 'pending' | 'paid' | 'failed' | 'refunded';
 
 export interface OrderItem {
   id: string;
@@ -78,6 +79,10 @@ export interface Order {
   couponCode?: string;
   total: number;
   paymentMethod?: PaymentMethod;
+  paymentStatus?: PaymentStatus;
+  isPaid?: boolean;
+  transactionId?: string;
+  paidAt?: number;
   customerNote?: string;
   createdAt: number;
   updatedAt: number;

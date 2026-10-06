@@ -24,13 +24,13 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
   const toggleLanguage = useCallback(() => {
     setLanguageState((prev) => {
-      const next = prev === 'en' ? 'da' : 'en';
+      const next = prev === 'da' ? 'en' : prev === 'en' ? 'tr' : 'da';
       localStorage.setItem('cv-language', next);
       return next;
     });
   }, []);
 
-  const t = translations[language];
+  const t = translations[language] || translations.da;
 
   return (
     <LanguageContext.Provider value={{ language, setLanguage, t, toggleLanguage }}>

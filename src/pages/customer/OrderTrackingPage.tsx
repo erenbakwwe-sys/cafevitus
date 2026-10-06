@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle2, Clock, ChefHat, Package, ArrowLeft, Utensils, Star, Sparkles, AlertCircle, ShieldCheck, Coffee } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, Package, ArrowLeft, Utensils, Star, Sparkles, AlertCircle, ShieldCheck, Coffee, Printer, CreditCard, Smartphone, Check } from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { storage } from '../../lib/storage';
@@ -53,6 +53,91 @@ export function OrderTrackingPage() {
 
     return () => unsubscribe();
   }, [tableId]);
+
+  const handlePrintReceipt = (order: Order) => {
+    const vatAmount = (order.total * 0.2).toFixed(2);
+    const windowContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Kvittering #${order.id.slice(0, 6).toUpperCase()} - Cafe Vitus</title>
+        <style>
+          body { font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.4; padding: 25px; max-width: 320px; margin: auto; }
+          .center { text-align: center; }
+          .line { border-top: 1px dashed #000; margin: 12px 0; }
+          .double-line { border-top: 2px dashed #000; margin: 12px 0; }
+          .row { display: flex; justify-content: space-between; margin: 4px 0; }
+          .bold { font-weight: bold; }
+          .small { font-size: 11px; color: #555; }
+        </style>
+      </head>
+      <body>
+        <div class="center">
+          <h2 style="margin:0; font-size:20px; letter-spacing:1px;">CAFE VITUS</h2>
+          <p class="small" style="margin:4px 0 0 0;">Snekkersten Havn • Strandvejen 88<br/>DK-3070 Snekkersten<br/>CVR: 38492019 • Tlf: +45 49 22 10 30</p>
+          <div class="line"></div>
+          <p class="bold" style="margin:0; font-size:14px;">BORD ${order.tableId} • KUNDEKVITTERING</p>
+          <p class="small" style="margin:2px 0 0 0;">Dato: ${new Date(order.createdAt).toLocaleDateString()} ${new Date(order.createdAt).toLocaleTimeString()}</p>
+          <p class="small" style="margin:0;">Ordrenr: #${order.id.slice(0, 6).toUpperCase()}</p>
+          ${order.transactionId ? `<p class="small" style="margin:0;">Transaktion: ${order.transactionId}</p>` : ''}
+        </div>
+        <div class="line"></div>
+        ${order.items.map((item) => `
+          <div class="row">
+            <span>${item.quantity}x ${item.name[language] || item.name.da || item.name.en}</span>
+            <span>${(item.unitPrice * item.quantity).toFixed(2)} kr</span>
+          </div>
+        `).join('')}
+        <div class="line"></div>
+        <div class="row">
+          <span>Subtotal:</span>
+          <span>${order.subtotal.toFixed(2)} kr</span>
+        </div>
+        ${order.tip > 0 ? `
+          <div class="row">
+            <span>Drikkepenge:</span>
+            <span>+${order.tip.toFixed(2)} kr</span>
+          </div>
+        ` : ''}
+        <div class="double-line"></div>
+        <div class="row bold" style="font-size: 16px;">
+          <span>TOTAL DKK:</span>
+          <span>${order.total.toFixed(2)} kr</span>
+        </div>
+        <div class="row small">
+          <span>Heraf moms (25%):</span>
+          <span>${vatAmount} kr</span>
+        </div>
+        <div class="line"></div>
+        <div class="row small">
+          <span>Betalingsmetode:</span>
+          <span class="bold">${order.paymentMethod?.toUpperCase()}</span>
+        </div>
+        <div class="row small">
+          <span>Status:</span>
+          <span class="bold">${order.isPaid ? 'BETALT / GODKENDT' : 'AFVENTER BETALING'}</span>
+        </div>
+        <div class="line"></div>
+        <div class="center small" style="margin-top:15px;">
+          <p>Tak for dit besøg på Cafe Vitus!</p>
+          <p>Del gerne din oplevelse på TripAdvisor ⭐⭐⭐⭐⭐</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '', 'width=420,height=650');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(windowContent);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(() => {
+        printWin.print();
+        printWin.close();
+      }, 500);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-[#F8F7F2] dark:bg-[#050A14] text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-400 pb-20">
@@ -211,6 +296,38 @@ export function OrderTrackingPage() {
                         </span>
                       </div>
                     ))}
+                  </div>
+
+                  {/* Payment & Receipt Banner */}
+                  <div className="mt-4 pt-3.5 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className={cn(
+                        "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider",
+                        order.isPaid
+                          ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30"
+                          : "bg-amber-500/15 text-amber-600 dark:text-amber-400 border border-amber-500/30"
+                      )}>
+                        {order.isPaid ? <Check className="w-3.5 h-3.5 stroke-[3]" /> : <Clock className="w-3.5 h-3.5" />}
+                        <span>{order.isPaid ? t.checkout?.statusPaid || 'BETALT' : t.checkout?.statusPending || 'AFVENTER BETALING'}</span>
+                      </span>
+
+                      {order.transactionId && (
+                        <span className="text-[11px] font-mono text-slate-400 font-bold hidden sm:inline">
+                          {order.transactionId}
+                        </span>
+                      )}
+                    </div>
+
+                    <motion.button
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      type="button"
+                      onClick={() => handlePrintReceipt(order)}
+                      className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-bold transition-colors cursor-pointer shadow-2xs"
+                    >
+                      <Printer className="w-3.5 h-3.5 text-amber-500" />
+                      <span>{t.checkout?.printReceipt || 'Print Kvittering'}</span>
+                    </motion.button>
                   </div>
                 </motion.div>
               );

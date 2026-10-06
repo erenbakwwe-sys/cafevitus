@@ -77,8 +77,18 @@ export default function KitchenPage() {
       >
         <div className="flex justify-between items-start border-b border-slate-100 dark:border-slate-800 pb-3.5">
           <div>
-            <div className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white Outfit">
-              {t.table.tableNumber} {order.tableId}
+            <div className="flex items-center gap-2">
+              <span className="text-2xl sm:text-3xl font-extrabold text-slate-950 dark:text-white Outfit">
+                {t.table.tableNumber} {order.tableId}
+              </span>
+              <span className={cn(
+                "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider",
+                order.isPaid
+                  ? "bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border border-emerald-500/40"
+                  : "bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-500/40"
+              )}>
+                {order.isPaid ? `BETALT • ${order.paymentMethod?.toUpperCase()}` : 'BETAL VED BORDET'}
+              </span>
             </div>
             <div className="text-xs text-slate-400 font-mono font-bold mt-0.5">#{order.id.slice(0, 6).toUpperCase()}</div>
           </div>

@@ -72,3 +72,10 @@ export function playReadySound(): void {
   // Pleasant ding for order ready
   playBeep(1200, 300, 1);
 }
+
+export function playPaymentSuccessSound(): void {
+  // Joyful three-tone ascending chord (C5 - E5 - G5)
+  playBeep(523.25, 120, 1);
+  setTimeout(() => playBeep(659.25, 120, 1), 120);
+  setTimeout(() => playBeep(783.99, 250, 1), 240);
+}
